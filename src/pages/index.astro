@@ -3,15 +3,29 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Spatchat">
-  <section class="text-center py-20">
+  <section
+  class="relative h-[600px] bg-cover bg-center bg-no-repeat"
+  style="background-image: url('/images/landcover_map_cropped.png');"
+>
+  <!-- Light overlay for readability -->
+  <div class="absolute inset-0 bg-white/50 backdrop-blur-sm"></div>
+
+  <!-- Hero content -->
+  <div class="relative z-10 flex flex-col items-center justify-center h-full text-center px-6">
     <h1 class="text-5xl font-extrabold mb-6">Spatchat</h1>
-    <p class="text-lg text-black-600 max-w-xl mx-auto mb-8">
+    <p class="text-lg text-black max-w-xl mx-auto mb-8">
       Spatchat.org is an open, extendable platform for conversational spatial analysis, powered by artificial intelligence and large language models.
     </p>
-    <a href="https://yourapp.link" target="_blank" class="inline-block bg-pink-400 text-white px-6 py-3 rounded-lg text-lg hover:bg-pink-500 transition"
->
+    <a
+      href="https://yourapp.link"
+      target="_blank"
+      class="inline-block bg-pink-400 text-white px-6 py-3 rounded-lg text-lg hover:bg-pink-500 transition"
+    >
       Launch Spatchat 🚀
     </a>
+  </div>
+</section>
+
 
 <section class="bg-pink-50 py-16">
   <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center px-6">
@@ -58,7 +72,7 @@ import Layout from '../layouts/Layout.astro';
 </section>
 
 <!-- Spacer between previous content and this section -->
-<div class="h-24"></div>
+<div class="h-14"></div>
 
 <!-- 🌟 Quick Start Section -->
 <div class="bg-pink-50/60 p-8 rounded-xl shadow-md">
