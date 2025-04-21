@@ -1,0 +1,45 @@
+---
+// src/pages/join.astro
+import Layout from '../layouts/Layout.astro';
+import GitHubStats from '../components/GitHubStats.astro'
+---
+
+<Layout title="Join the Community">
+  <h1 class="text-3xl font-bold mb-4 flex items-center gap-2">
+  </h1>
+
+
+<section class="text-center bg-gradient-to-r from-pink-100/60 to-pink-200/40 backdrop-blur-sm rounded-xl shadow-inner">
+
+<p class="max-w-2xl mx-auto text-black-600 mb-10 py-12">
+  We're building Spatchat to make spatial analysis intuitive, conversational, and open to everyone.
+  Whether you're a coder, designer, scientist, or curious explorer — there's a place for you here.
+</p>
+</section>
+
+
+<section class="py-16 text-center">
+  <h2 class="text-2xl font-bold mb-4">Join the Community</h2>
+
+
+<section class="py-8 text-center">
+  <p class="text-black-600 mb-12">
+    Spatchat currently allows users to calculate Landscape Metrics leveraging the Python library <a href="https://pylandstats.readthedocs.io/en/latest/" class="text-pink-600 underline hover:text-pink-800">PyLandStats</a>, but Spatchat's flexibility allows easy integration with additional tools. In the future, we hope to grow a developer community and extend Spatchat to countless other ecological tools. If you are interested in becoming a part of this movement, please visit our GitHub Repository below and join our community!
+  </p>
+
+<!-- 🔗 GitHub Stats -->
+    <div class="mt-12">
+	<GitHubStats />
+	</div>
+    <div class="mt-12">
+      <a
+        href="https://github.com/LoganHysen/summarization_tool_test"
+        target="_blank"
+        class="inline-block bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700 transition"
+      >
+        🌟 Star on GitHub
+      </a>
+    </div>
+</section>
+
+</Layout>

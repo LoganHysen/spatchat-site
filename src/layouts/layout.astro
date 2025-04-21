@@ -1,0 +1,31 @@
+---
+import "../styles/global.css";  // 👈 THIS IS THE IMPORTANT LINE
+const { title } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{title}</title>
+  </head>
+  <body class="bg-gray-100 text-gray-900 font-sans">
+    <header class="bg-white shadow sticky top-0 z-10">
+  	<nav class="max-w-6x1 mx-auto px-12 py-3 flex justify-between items-center">
+    	  <a href="/" class="text-2xl font-bold gap-3"> <img src="/icons/spatchat_logo.jpg" alt="Spatchat Logo" class="h-18 w-auto rounded"> Spatchat </a>
+    	  <ul class="flex space-x-6 text-gray-700 text-lg">
+      	    <li><a href="/" class="hover:text-blue-600">Home</a></li>
+      	    <li><a href="/join" class="hover:text-blue-600">Join</a></li>
+      	    <li><a href="/docs" class="hover:text-blue-600">Docs</a></li>
+    	  </ul>
+  	</nav>
+    </header>
+
+    <main class="container mx-auto p-8">
+      <slot />
+    </main>
+<footer class="bg-gray-100 text-center py-6 text-sm text-gray-500 mt-10">
+  Built with ❤️ using Astro + Tailwind
+</footer>
+
+  </body>
+</html>

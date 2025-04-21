@@ -1,0 +1,79 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Spatchat">
+  <section class="text-center py-20">
+    <h1 class="text-5xl font-extrabold mb-6">Spatchat</h1>
+    <p class="text-lg text-black-600 max-w-xl mx-auto mb-8">
+      Spatchat.org is an open, extendable platform for conversational spatial analysis, powered by artificial intelligence and large language models.
+    </p>
+    <a href="https://yourapp.link" target="_blank" class="inline-block bg-pink-400 text-white px-6 py-3 rounded-lg text-lg hover:bg-pink-500 transition"
+>
+      Launch Spatchat 🚀
+    </a>
+
+<section class="bg-pink-50 py-16">
+  <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center px-6">
+    <div>
+      <span class="text-4xl">🧠</span>
+      <h3 class="text-xl font-semibold mt-2 mb-1">AI-Powered</h3>
+      <p class="text-gray-600">Ask questions in plain language and get spatial answers instantly.</p>
+    </div>
+    <div>
+      <span class="text-4xl">🌍</span>
+      <h3 class="text-xl font-semibold mt-2 mb-1">Spatial Intelligence</h3>
+      <p class="text-gray-600">Built for geospatial data. Works with rasters, vectors, and more.</p>
+    </div>
+    <div>
+      <span class="text-4xl">🛠️</span>
+      <h3 class="text-xl font-semibold mt-2 mb-1">Extensible</h3>
+      <p class="text-gray-600">Easily extend the platform with your own tools or models.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- Spacer between previous content and this section -->
+<div class="h8"></div>
+
+<!-- Gradient + transparent pink section -->
+<section class="bg-gradient-to-r from-pink-100/60 to-pink-200/40 backdrop-blur-sm rounded-xl shadow-inner">
+  <div class="max-w-6xl mx-auto px-6 py-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+    <!-- 🖼️ Image -->
+    <img
+      src="/images/sample_pic.jpg"
+      alt="Screenshot of the app"
+      class="w-full rounded-lg shadow-lg"
+    />
+
+    <!-- 💬 Text Content -->
+    <div>
+      <h2 class="text-3xl font-bold mb-4">The Future of Analysis</h2>
+      <p class="text-black-700 mb-6">
+        Spatchat suggests a future where spatial modeling is not bound to syntax, but liberated through semantics. Analysts no longer need to memorize obscure function calls. They can reason through problems naturally, guided by AI-powered assistants that understand both ecology and computation.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Spacer between previous content and this section -->
+<div class="h-24"></div>
+
+<!-- 🌟 Quick Start Section -->
+<div class="bg-pink-50/60 p-8 rounded-xl shadow-md">
+  <h2 class="text-2xl font-bold text-pink-700 mb-4">Quick Start</h2>
+  <p class="text-gray-700 mb-4">
+    Ready to dive in? Here’s how to get up and running with Spatchat in under a minute.
+  </p>
+  <ol class="list-decimal list-inside text-gray-800 space-y-2">
+    <li>Launch the app using the button above. It will open in a new browser tab.</li>
+    <li>Drag and drop a raster or shapefile into the interface.</li>
+    <li>Start typing your questions about the landscape.</li>
+    <li>Explore outputs and tweak your analysis interactively.</li>
+    <li> Check out the <a href="/docs" class="text-pink-600 underline hover:text-pink-800">documentation page</a> to explore tutorials, papers, and more.</li>
+  </ol>
+</div>
+
+  </section>
+</Layout>

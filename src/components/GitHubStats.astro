@@ -1,0 +1,63 @@
+---
+const repo = 'LoganHysen/Summarization_tool_test'; // ← Replace with your repo
+const githubUrl = `https://github.com/${repo}`;
+
+let stats = {
+  stars: 0,
+  forks: 0,
+  watchers: 0,
+};
+
+try {
+  const res = await fetch(`https://api.github.com/repos/${repo}`);
+  if (res.ok) {
+    const data = await res.json();
+    stats = {
+      stars: data.stargazers_count,
+      forks: data.forks_count,
+      watchers: data.subscribers_count,
+    };
+  } else {
+    console.error('GitHub API Error:', res.statusText);
+  }
+} catch (err) {
+  console.error('Failed to fetch GitHub stats:', err);
+}
+---
+<!-- GitHub Link with Icon -->
+<div class="text-center mb-6">
+  <a
+    href={githubUrl}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="inline-flex items-center text-gray-800 hover:text-pink-600 transition"
+  >
+    <!-- GitHub SVG Icon -->
+    <svg
+      class="w-6 h-6 mr-2"
+      fill="currentColor"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+    >
+      <path
+        fill-rule="evenodd"
+        d="M12 0C5.37 0 0 5.373 0 12a12 12 0 008.205 11.385c.6.113.82-.26.82-.577v-2.04c-3.338.725-4.042-1.61-4.042-1.61-.546-1.386-1.333-1.755-1.333-1.755-1.09-.745.083-.73.083-.73 1.205.084 1.84 1.242 1.84 1.242 1.07 1.834 2.807 1.304 3.492.997.108-.774.42-1.304.762-1.604-2.665-.308-5.466-1.334-5.466-5.93 0-1.31.468-2.382 1.235-3.222-.123-.307-.535-1.54.117-3.213 0 0 1.008-.322 3.3 1.23a11.47 11.47 0 016 0c2.29-1.553 3.296-1.23 3.296-1.23.654 1.673.242 2.906.12 3.213.77.84 1.232 1.912 1.232 3.222 0 4.61-2.804 5.618-5.476 5.922.432.372.816 1.102.816 2.222v3.293c0 .32.216.694.824.576A12.002 12.002 0 0024 12c0-6.627-5.373-12-12-12z"
+        clip-rule="evenodd"
+      />
+    </svg>
+    <span class="text-lg font-semibold">View on GitHub</span>
+  </a>
+</div>
+
+<!-- GitHub Stats -->
+<div class="flex flex-col md:flex-row gap-4 justify-center text-center">
+  <div class="bg-gray-100 rounded-lg p-4 shadow">
+    ⭐ <strong>{stats.stars}</strong> Stars
+  </div>
+  <div class="bg-gray-100 rounded-lg p-4 shadow">
+    🍴 <strong>{stats.forks}</strong> Forks
+  </div>
+  <div class="bg-gray-100 rounded-lg p-4 shadow">
+    👀 <strong>{stats.watchers}</strong> Watchers
+  </div>
+</div>

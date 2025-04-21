@@ -1,0 +1,22 @@
+body {
+    font-family: sans-serif;
+    margin: 2rem;
+    background: #fdfdfd;
+    color: #333;
+  }
+  
+  a {
+    color: #0070f3;
+    text-decoration: none;
+  }
+  
+  nav ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  nav li {
+    display: inline;
+    margin-right: 1rem;
+  }
+  
