@@ -1,5 +1,4 @@
-const fs = require("fs");
-const path = require("path");
+const fetch = require("node-fetch");
 
 exports.handler = async (event) => {
   if (event.httpMethod !== "POST") {
@@ -9,50 +8,53 @@ exports.handler = async (event) => {
     };
   }
 
-  let botId;
+  const { JSONBIN_API_KEY, JSONBIN_BIN_ID } = process.env;
 
+  let botId;
   try {
     const body = JSON.parse(event.body || "{}");
     botId = body.botId;
     if (!botId) throw new Error("Missing botId");
-  } catch (err) {
+  } catch {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Invalid request body or missing botId" }),
     };
   }
 
-  const filePath = path.join(__dirname, "click-data.json");
-
-  let data = {};
-  try {
-    if (fs.existsSync(filePath)) {
-      const raw = fs.readFileSync(filePath, "utf8");
-      data = JSON.parse(raw);
-    }
-  } catch (err) {
-    console.error("Failed to read data file:", err);
-  }
-
-  // Append timestamp to bot's array
-  const timestamp = new Date().toISOString();
-  if (!Array.isArray(data[botId])) {
-    data[botId] = [];
-  }
-  data[botId].push(timestamp);
+  const binUrl = `https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`;
+  const headers = {
+    "Content-Type": "application/json",
+    "X-Master-Key": JSONBIN_API_KEY,
+  };
 
   try {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+    // Get current click data
+    const res = await fetch(binUrl, { headers });
+    const json = await res.json();
+    const data = json.record || {};
+
+    // Append new timestamp
+    const timestamp = new Date().toISOString();
+    data[botId] = data[botId] || [];
+    data[botId].push(timestamp);
+
+    // Update bin
+    await fetch(binUrl, {
+      method: "PUT",
+      headers,
+      body: JSON.stringify(data),
+    });
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ success: true, count: data[botId].length }),
+    };
   } catch (err) {
-    console.error("Failed to write data file:", err);
+    console.error("❌ JSONBin error:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to write data file" }),
+      body: JSON.stringify({ error: "Failed to log click" }),
     };
   }
-
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ success: true, count: data[botId].length }),
-  };
 };

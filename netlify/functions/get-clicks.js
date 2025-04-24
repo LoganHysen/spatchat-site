@@ -1,32 +1,30 @@
-const fs = require("fs");
-const path = require("path");
+const fetch = require("node-fetch");
 
 exports.handler = async () => {
-  const filePath = path.join(__dirname, "click-data.json");
+  const { JSONBIN_API_KEY, JSONBIN_BIN_ID } = process.env;
 
   try {
-    let all = {};
-
-    if (fs.existsSync(filePath)) {
-      const raw = fs.readFileSync(filePath, "utf8");
-      all = JSON.parse(raw);
-    } else {
-      console.warn("⚠️ click-data.json not found. Returning empty object.");
-    }
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+      headers: {
+        "X-Master-Key": JSONBIN_API_KEY,
+      },
+    });
+    const json = await res.json();
+    const data = json.record || {};
 
     return {
       statusCode: 200,
-      body: JSON.stringify(all),
+      body: JSON.stringify(data),
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       },
     };
-  } catch (e) {
-    console.error("❌ Failed to read or parse click-data.json:", e);
+  } catch (err) {
+    console.error("❌ JSONBin get error:", err);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to read data" }),
+      body: JSON.stringify({ error: "Failed to load click data" }),
     };
   }
 };
