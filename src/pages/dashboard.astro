@@ -1,15 +1,75 @@
 ---
 import Layout from '../layouts/layout.astro';
-import ClickChart from '../components/ClickChart.astro';
-
-// Fetch click data from the Netlify function
-const res = await fetch('/.netlify/functions/get-clicks'); // ← change to full URL in prod
-const data = await res.json();
 ---
 
 <Layout title="Click Dashboard">
   <section class="max-w-5xl mx-auto px-6 py-16 text-center">
     <h1 class="text-4xl font-bold mb-8">📊 Click Activity Dashboard</h1>
-    <ClickChart data={data} />
+    <canvas id="clickChart" class="w-full max-w-4xl mx-auto"></canvas>
   </section>
+
+  <script type="module">
+    import { Chart } from 'chart.js/auto';
+
+    async function loadChart() {
+      const res = await fetch('/.netlify/functions/get-clicks');
+      const data = await res.json();
+
+      const botDateCounts = {};
+
+      for (const botId in data) {
+        const timestamps = data[botId];
+        if (!Array.isArray(timestamps)) continue;
+
+        timestamps.forEach(ts => {
+          const date = ts.split('T')[0];
+          botDateCounts[botId] = botDateCounts[botId] || {};
+          botDateCounts[botId][date] = (botDateCounts[botId][date] || 0) + 1;
+        });
+      }
+
+      const allDates = Array.from(
+        new Set(Object.values(botDateCounts).flatMap(obj => Object.keys(obj)))
+      ).sort();
+
+      const colors = [
+        'rgba(236, 72, 153, 1)',
+        'rgba(59, 130, 246, 1)',
+        'rgba(34, 197, 94, 1)',
+        'rgba(251, 191, 36, 1)',
+      ];
+
+      const datasets = Object.entries(botDateCounts).map(([botId, counts], i) => ({
+        label: botId,
+        data: allDates.map(date => counts[date] || 0),
+        borderColor: colors[i % colors.length],
+        backgroundColor: colors[i % colors.length],
+        fill: false,
+        tension: 0.3,
+      }));
+
+      new Chart(document.getElementById('clickChart'), {
+        type: 'line',
+        data: {
+          labels: allDates,
+          datasets,
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Clicks per Day by Bot',
+            },
+            legend: {
+              display: true,
+              position: 'bottom',
+            },
+          },
+        },
+      });
+    }
+
+    loadChart();
+  </script>
 </Layout>
