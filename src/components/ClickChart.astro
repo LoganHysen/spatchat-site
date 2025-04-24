@@ -7,10 +7,11 @@ const botDateCounts = {};
 for (const botId in data) {
   const timestamps = data[botId];
 
-  if (!botDateCounts[botId]) botDateCounts[botId] = {};
+  if (!Array.isArray(timestamps)) continue; // ✅ Skip bad data
 
   timestamps.forEach((ts) => {
-    const date = ts.split('T')[0]; // Get YYYY-MM-DD
+    const date = ts.split('T')[0];
+    botDateCounts[botId] = botDateCounts[botId] || {};
     botDateCounts[botId][date] = (botDateCounts[botId][date] || 0) + 1;
   });
 }

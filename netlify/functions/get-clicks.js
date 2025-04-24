@@ -5,21 +5,21 @@ exports.handler = async () => {
   const filePath = path.join(__dirname, "click-data.json");
 
   try {
-    const data = fs.readFileSync(filePath, "utf8");
-    const counts = JSON.parse(data);
+    const raw = fs.readFileSync(filePath, "utf8");
+    const all = JSON.parse(raw);
 
     return {
       statusCode: 200,
-      body: JSON.stringify(counts),
+      body: JSON.stringify(all),
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*", // in case you fetch it from anywhere
+        "Access-Control-Allow-Origin": "*",
       },
     };
-  } catch (err) {
+  } catch (e) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to load click data" }),
+      body: JSON.stringify({ error: "Failed to read data" }),
     };
   }
 };

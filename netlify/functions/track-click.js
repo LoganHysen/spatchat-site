@@ -9,11 +9,16 @@ exports.handler = async (event) => {
     };
   }
 
-  const { botId } = JSON.parse(event.body || "{}");
-  if (!botId) {
+  let botId;
+
+  try {
+    const body = JSON.parse(event.body || "{}");
+    botId = body.botId;
+    if (!botId) throw new Error("Missing botId");
+  } catch (err) {
     return {
       statusCode: 400,
-      body: "Missing botId",
+      body: JSON.stringify({ error: "Invalid request body or missing botId" }),
     };
   }
 
@@ -22,21 +27,28 @@ exports.handler = async (event) => {
   let data = {};
   try {
     if (fs.existsSync(filePath)) {
-      data = JSON.parse(fs.readFileSync(filePath, "utf8"));
+      const raw = fs.readFileSync(filePath, "utf8");
+      data = JSON.parse(raw);
     }
   } catch (err) {
-    console.error("Error reading file", err);
+    console.error("Failed to read data file:", err);
   }
 
+  // Append timestamp to bot's array
   const timestamp = new Date().toISOString();
-  data[botId] = data[botId] || [];
+  if (!Array.isArray(data[botId])) {
+    data[botId] = [];
+  }
   data[botId].push(timestamp);
 
   try {
     fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
   } catch (err) {
-    console.error("Error writing file", err);
-    return { statusCode: 500, body: "Failed to write data" };
+    console.error("Failed to write data file:", err);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: "Failed to write data file" }),
+    };
   }
 
   return {
