@@ -1,6 +1,4 @@
 window.addEventListener('DOMContentLoaded', async () => {
-    console.log("🟣 Chart script loaded!");
-  
     const canvas = document.getElementById('clickChart');
     if (!canvas || typeof Chart === 'undefined') {
       console.warn("Chart.js not loaded or canvas missing.");

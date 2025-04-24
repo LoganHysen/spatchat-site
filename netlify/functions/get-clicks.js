@@ -1,30 +1,32 @@
 const fetch = require("node-fetch");
 
 exports.handler = async () => {
-  const { JSONBIN_API_KEY, JSONBIN_BIN_ID } = process.env;
+  const binId = process.env.JSONBIN_BIN_ID;
+  const apiKey = process.env.JSONBIN_API_KEY;
+
+  const url = `https://api.jsonbin.io/v3/b/${binId}/latest`;
 
   try {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+    const res = await fetch(url, {
       headers: {
-        "X-Master-Key": JSONBIN_API_KEY,
+        "X-Master-Key": apiKey,
       },
     });
+
     const json = await res.json();
-    const data = json.record || {};
 
     return {
       statusCode: 200,
-      body: JSON.stringify(data),
+      body: JSON.stringify(json.record),
       headers: {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "*",
       },
     };
-  } catch (err) {
-    console.error("❌ JSONBin get error:", err);
+  } catch (e) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Failed to load click data" }),
+      body: JSON.stringify({ error: "Failed to fetch click data" }),
     };
   }
 };
