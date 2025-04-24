@@ -1,0 +1,65 @@
+---
+import Layout from '../layouts/Layout.astro';
+import chatbots from '../data/chatbots.json';
+---
+
+<Layout title="Browse Chatbots">
+  <section id="browse-section" class="max-w-6xl mx-auto px-6 py-16 text-center">
+    <h1 class="text-4xl font-bold mb-10">🧠 Browse Spatchat Assistants</h1>
+<p class="text-gray-600 text-lg mb-10 max-w-2xl mx-auto">
+  Explore AI-powered spatial analysis assistants tailored to your research interests. Click a module to launch an interactive chat.
+</p>
+
+    <div id="chatbot-grid" class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      {chatbots.map(bot => (
+        <a
+  href={`/browse?room=${bot.id}`}
+  class="block bg-white shadow-md rounded-2xl p-8 hover:shadow-2xl transition text-left border border-gray-100 h-full"
+>
+  <h2 class="text-2xl font-bold mb-4 text-pink-700">{bot.title}</h2>
+
+  <div class="flex flex-wrap gap-2 text-sm mb-6">
+    {bot.tags.map(tag => (
+      <span class="bg-pink-100 text-pink-700 px-3 py-1 rounded-full">{tag}</span>
+    ))}
+  </div>
+
+  <p class="text-gray-700 text-base leading-relaxed">{bot.description}</p>
+</a>
+
+      ))}
+    </div>
+  </section>
+
+  <!-- JavaScript: Replace content based on ?room= param -->
+  <script type="module">
+    const bots = {
+      landmetrics: {
+        title: "Landscape Metrics Chatbot",
+        url: "https://hoyiwan-spatchat.hf.space/",
+      },
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    const room = params.get("room");
+
+    if (room && bots[room]) {
+      const section = document.getElementById("browse-section");
+      const bot = bots[room];
+
+      section.innerHTML = `
+        <div class="max-w-6xl mx-auto text-center mb-4">
+          <h1 class="text-3xl font-bold mb-2">${bot.title}</h1>
+          <a href="/browse" class="text-pink-600 underline hover:text-pink-800 text-sm">← Back to all chatbots</a>
+        </div>
+        <div class="h-[90vh] w-full">
+          <iframe
+            src="${bot.url}"
+            class="w-full h-full rounded-lg shadow-lg border"
+            allow="clipboard-write"
+          ></iframe>
+        </div>
+      `;
+    }
+  </script>
+</Layout>
