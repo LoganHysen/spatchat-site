@@ -6,28 +6,27 @@ import chatbots from '../data/chatbots.json';
 <Layout title="Browse Chatbots">
   <section id="browse-section" class="max-w-6xl mx-auto px-6 py-16 text-center">
     <h1 class="text-4xl font-bold mb-10">🧠 Browse Spatchat Assistants</h1>
-<p class="text-gray-600 text-lg mb-10 max-w-2xl mx-auto">
-  Explore AI-powered spatial analysis assistants tailored to your research interests. Click a module to launch an interactive chat.
-</p>
+    <p class="text-gray-600 text-lg mb-10 max-w-2xl mx-auto">
+      Explore AI-powered spatial analysis assistants tailored to your research interests. Click a module to launch an interactive chat.
+    </p>
 
     <div id="chatbot-grid" class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
       {chatbots.map(bot => (
         <a
-  href={`/browse?room=${bot.id}`}
-  onclick="trackBotClick('${bot.id}')"
-  class="block bg-white shadow-md rounded-2xl p-8 hover:shadow-2xl transition text-left border border-gray-100 h-full"
->
-  <h2 class="text-2xl font-bold mb-4 text-pink-700">{bot.title}</h2>
+          href={`/browse?room=${bot.id}`}
+          class="bot-card block bg-white shadow-md rounded-2xl p-8 hover:shadow-2xl transition text-left border border-gray-100 h-full"
+          data-bot-id={bot.id}
+        >
+          <h2 class="text-2xl font-bold mb-4 text-pink-700">{bot.title}</h2>
 
-  <div class="flex flex-wrap gap-2 text-sm mb-6">
-    {bot.tags.map(tag => (
-      <span class="bg-pink-100 text-pink-700 px-3 py-1 rounded-full">{tag}</span>
-    ))}
-  </div>
+          <div class="flex flex-wrap gap-2 text-sm mb-6">
+            {bot.tags.map(tag => (
+              <span class="bg-pink-100 text-pink-700 px-3 py-1 rounded-full">{tag}</span>
+            ))}
+          </div>
 
-  <p class="text-gray-700 text-base leading-relaxed">{bot.description}</p>
-</a>
-
+          <p class="text-gray-700 text-base leading-relaxed">{bot.description}</p>
+        </a>
       ))}
     </div>
   </section>
@@ -64,14 +63,26 @@ import chatbots from '../data/chatbots.json';
     }
   </script>
 
-<script>
-  function trackBotClick(botId) {
-    fetch("/.netlify/functions/track-click", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ botId }),
+  <!-- Click tracking script -->
+  <script is:inline>
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll(".bot-card").forEach(card => {
+        card.addEventListener("click", async (e) => {
+          const botId = card.dataset.botId;
+          if (!botId) return;
+          try {
+            const res = await fetch("/.netlify/functions/track-clicks", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ botId }),
+            });
+            const json = await res.json();
+            console.log("✅ Click tracked:", json);
+          } catch (err) {
+            console.error("❌ Failed to track click:", err);
+          }
+        });
+      });
     });
-  }
-</script>
-
+  </script>
 </Layout>
