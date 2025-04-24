@@ -5,8 +5,14 @@ exports.handler = async () => {
   const filePath = path.join(__dirname, "click-data.json");
 
   try {
-    const raw = fs.readFileSync(filePath, "utf8");
-    const all = JSON.parse(raw);
+    let all = {};
+
+    if (fs.existsSync(filePath)) {
+      const raw = fs.readFileSync(filePath, "utf8");
+      all = JSON.parse(raw);
+    } else {
+      console.warn("⚠️ click-data.json not found. Returning empty object.");
+    }
 
     return {
       statusCode: 200,
@@ -17,6 +23,7 @@ exports.handler = async () => {
       },
     };
   } catch (e) {
+    console.error("❌ Failed to read or parse click-data.json:", e);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "Failed to read data" }),
