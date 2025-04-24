@@ -14,6 +14,7 @@ import chatbots from '../data/chatbots.json';
       {chatbots.map(bot => (
         <a
   href={`/browse?room=${bot.id}`}
+  onclick="trackBotClick('${bot.id}')"
   class="block bg-white shadow-md rounded-2xl p-8 hover:shadow-2xl transition text-left border border-gray-100 h-full"
 >
   <h2 class="text-2xl font-bold mb-4 text-pink-700">{bot.title}</h2>
@@ -62,4 +63,15 @@ import chatbots from '../data/chatbots.json';
       `;
     }
   </script>
+
+<script>
+  function trackBotClick(botId) {
+    fetch("/.netlify/functions/track-click", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ botId }),
+    });
+  }
+</script>
+
 </Layout>

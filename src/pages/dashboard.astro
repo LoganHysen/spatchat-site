@@ -1,0 +1,15 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ClickChart from '../components/ClickChart.astro';
+
+// Fetch click data from the Netlify function
+const res = await fetch('http://localhost:8888/.netlify/functions/get-clicks'); // ← change to full URL in prod
+const data = await res.json();
+---
+
+<Layout title="Click Dashboard">
+  <section class="max-w-5xl mx-auto px-6 py-16 text-center">
+    <h1 class="text-4xl font-bold mb-8">📊 Click Activity Dashboard</h1>
+    <ClickChart data={data} />
+  </section>
+</Layout>

@@ -1,0 +1,70 @@
+---
+const { data } = Astro.props;
+
+// Build { [botId]: { [YYYY-MM-DD]: count } }
+const botDateCounts = {};
+
+for (const botId in data) {
+  const timestamps = data[botId];
+
+  if (!botDateCounts[botId]) botDateCounts[botId] = {};
+
+  timestamps.forEach((ts) => {
+    const date = ts.split('T')[0]; // Get YYYY-MM-DD
+    botDateCounts[botId][date] = (botDateCounts[botId][date] || 0) + 1;
+  });
+}
+
+// Collect all unique dates across all bots
+const allDates = Array.from(
+  new Set(
+    Object.values(botDateCounts)
+      .flatMap(obj => Object.keys(obj))
+  )
+).sort();
+
+// Create Chart.js datasets
+const colors = [
+  'rgba(236, 72, 153, 1)', // pink
+  'rgba(59, 130, 246, 1)', // blue
+  'rgba(34, 197, 94, 1)',  // green
+  'rgba(251, 191, 36, 1)', // yellow
+];
+
+const datasets = Object.entries(botDateCounts).map(([botId, dateCounts], index) => ({
+  label: botId,
+  data: allDates.map(date => dateCounts[date] || 0),
+  fill: false,
+  borderColor: colors[index % colors.length],
+  backgroundColor: colors[index % colors.length],
+  tension: 0.2,
+}));
+
+const chartData = {
+  labels: allDates,
+  datasets,
+};
+---
+
+<canvas id="clicksChart" class="w-full max-w-4xl mx-auto"></canvas>
+
+<script type="module">
+  import { Chart } from 'chart.js/auto';
+
+  const ctx = document.getElementById('clicksChart').getContext('2d');
+
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: JSON.parse(decodeURIComponent('{JSON.stringify(chartData)}')),
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: true, position: 'bottom' },
+        title: { display: true, text: 'Clicks Per Day by Bot' },
+      },
+      scales: {
+        y: { beginAtZero: true },
+      }
+    },
+  });
+</script>
