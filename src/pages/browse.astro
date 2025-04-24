@@ -64,25 +64,33 @@ import chatbots from '../data/chatbots.json';
   </script>
 
   <!-- Click tracking script -->
-  <script is:inline>
-    document.addEventListener("DOMContentLoaded", () => {
-      document.querySelectorAll(".bot-card").forEach(card => {
-        card.addEventListener("click", async (e) => {
-          const botId = card.dataset.botId;
-          if (!botId) return;
-          try {
-            const res = await fetch("/.netlify/functions/track-clicks", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ botId }),
-            });
-            const json = await res.json();
-            console.log("✅ Click tracked:", json);
-          } catch (err) {
-            console.error("❌ Failed to track click:", err);
-          }
-        });
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".bot-card").forEach(card => {
+      card.addEventListener("click", async (e) => {
+        e.preventDefault(); // ⛔ stop the link from navigating immediately
+
+        const botId = card.dataset.botId;
+        const href = card.getAttribute("href");
+        if (!botId || !href) return;
+
+        try {
+          const res = await fetch("/.netlify/functions/track-clicks", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ botId }),
+          });
+          const json = await res.json();
+          console.log("✅ Click tracked:", json);
+        } catch (err) {
+          console.error("❌ Failed to track click:", err);
+        }
+
+        // ✅ Navigate after tracking
+        window.location.href = href;
       });
     });
-  </script>
+  });
+</script>
+
 </Layout>
