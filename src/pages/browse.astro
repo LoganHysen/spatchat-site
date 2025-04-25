@@ -32,59 +32,77 @@ import chatbots from '../data/chatbots.json';
   </section>
 
   <!-- JavaScript: Replace content based on ?room= param -->
-  <!-- Keep your <script type="module"> for the iframe logic ONLY -->
-<script type="module">
-  const bots = {
-    landmetrics: {
-      title: "Landscape Metrics Chatbot",
-      url: "https://hoyiwan-spatchat.hf.space/",
-    },
-    // more bots...
-  };
-
-  const params = new URLSearchParams(window.location.search);
-  const room = params.get("room");
-
-  if (room && bots[room]) {
-    const section = document.getElementById("browse-section");
-    const bot = bots[room];
-
-    section.innerHTML = `...`; // iframe and fullscreen buttons here
-
-    // Fullscreen logic
-    setTimeout(() => {
-      ...
-    }, 100);
-  }
-</script>
 
 <!-- ✅ New non-module script to track clicks -->
 <script>
   document.addEventListener("DOMContentLoaded", () => {
-    document.querySelectorAll(".bot-card").forEach(card => {
-      card.addEventListener("click", (e) => {
-        const botId = card.dataset.botId;
-        const href = card.getAttribute("href");
-        if (!botId || !href) return;
+    const bots = {
+      landmetrics: {
+        title: "Landscape Metrics Chatbot",
+        url: "https://hoyiwan-spatchat.hf.space/",
+      },
+      // add more bots as needed
+    };
 
-        // Fire and forget: don't block navigation
-        fetch("/.netlify/functions/track-clicks", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ botId }),
-        }).catch(err => {
-          console.error("❌ Click tracking failed:", err);
+    const params = new URLSearchParams(window.location.search);
+    const room = params.get("room");
+
+    if (room && bots[room]) {
+      const section = document.getElementById("browse-section");
+      const bot = bots[room];
+
+      section.innerHTML = `
+        <div class="max-w-6xl mx-auto text-center mb-4">
+          <h1 class="text-3xl font-bold mb-2">${bot.title}</h1>
+          <a href="/browse" class="text-pink-600 underline hover:text-pink-800 text-sm">← Back to all chatbots</a>
+        </div>
+        <div class="h-[90vh] w-full">
+          <div class="flex gap-4 justify-center mt-6">
+            <button
+              id="fullscreenBtn"
+              class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600 transition"
+            >
+              🔍 Fullscreen
+            </button>
+            <button
+              id="exitFullscreenBtn"
+              class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition hidden"
+            >
+              🔙 Collapse
+            </button>
+          </div>
+
+          <iframe
+            id="bot-frame"
+            src="${bot.url}"
+            class="w-full h-full rounded-lg shadow-lg border mt-4"
+            allow="clipboard-write"
+            allowfullscreen
+          ></iframe>
+        </div>
+      `;
+
+      // Fullscreen logic
+      setTimeout(() => {
+        const fullscreenBtn = document.getElementById('fullscreenBtn');
+        const exitFullscreenBtn = document.getElementById('exitFullscreenBtn');
+        const iframe = document.getElementById('bot-frame');
+
+        fullscreenBtn?.addEventListener('click', () => {
+          iframe?.requestFullscreen?.();
         });
 
-        // Let the navigation happen
-        window.location.href = href;
+        exitFullscreenBtn?.addEventListener('click', () => {
+          document.exitFullscreen?.();
+        });
 
-        //setTimeout(() => (window.location.href = href), 100);
-      });
-    });
+        document.addEventListener('fullscreenchange', () => {
+          const isFullscreen = document.fullscreenElement !== null;
+          fullscreenBtn?.classList.toggle('hidden', isFullscreen);
+          exitFullscreenBtn?.classList.toggle('hidden', !isFullscreen);
+        });
+      }, 100);
+    }
   });
 </script>
-
-
-
 </Layout>
