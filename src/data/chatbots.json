@@ -1,9 +1,15 @@
 [
     {
       "id": "landmetrics",
-      "title": "Landscape Metrics Chatbot",
-      "tags": ["landscape", "ecology", "metrics"],
+      "title": "Landscape Metrics Chat Room",
+      "tags": ["landscape metrics", "configuration", "composition"],
       "description": "Analyze landscape patterns using natural language.",
       "url": "https://hoyiwan-spatchat.hf.space"
+    },
+    {
+      "id": "sdm",
+      "title": "Species Distribution Modeling Chat Room",
+      "tags": ["SDM", "distributions", "MaxEnt", "presence"],
+      "description": "Model species distributions using natural language."
     }
   ]
