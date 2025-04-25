@@ -44,6 +44,32 @@ import chatbots from '../data/chatbots.json';
       // add more bots as needed
     };
 
+    // ✅ Click tracking for bot cards
+    document.querySelectorAll(".bot-card").forEach(card => {
+      card.addEventListener("click", (e) => {
+        e.preventDefault();
+
+        const botId = card.dataset.botId;
+        const href = card.getAttribute("href");
+        if (!botId || !href) return;
+
+        // Send tracking request
+        fetch("/.netlify/functions/track-clicks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ botId }),
+        }).catch(err => {
+          console.error("❌ Click tracking failed:", err);
+        });
+
+        // Slight delay before navigating
+        setTimeout(() => {
+          window.location.href = href;
+        }, 150);
+      });
+    });
+
+    // ✅ Show iframe if room param exists
     const params = new URLSearchParams(window.location.search);
     const room = params.get("room");
 
