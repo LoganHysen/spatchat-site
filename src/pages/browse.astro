@@ -62,26 +62,24 @@ import chatbots from '../data/chatbots.json';
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".bot-card").forEach(card => {
-      card.addEventListener("click", async (e) => {
-        e.preventDefault();
-
+      card.addEventListener("click", (e) => {
         const botId = card.dataset.botId;
         const href = card.getAttribute("href");
         if (!botId || !href) return;
 
-        try {
-          const res = await fetch("/.netlify/functions/track-clicks", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ botId }),
-          });
-          const json = await res.json();
-          console.log("✅ Click tracked:", json);
-        } catch (err) {
-          console.error("❌ Failed to track click:", err);
-        }
+        // Fire and forget: don't block navigation
+        fetch("/.netlify/functions/track-clicks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ botId }),
+        }).catch(err => {
+          console.error("❌ Click tracking failed:", err);
+        });
 
-        window.location.href = href;
+        // Let the navigation happen
+        // window.location.href = href;
+
+        setTimeout(() => (window.location.href = href), 100);
       });
     });
   });
