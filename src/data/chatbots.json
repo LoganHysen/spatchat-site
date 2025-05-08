@@ -11,6 +11,6 @@
       "title": "Species Distribution Modeling Chat Room",
       "tags": ["SDM", "distributions", "MaxEnt", "presence"],
       "description": "Model species distributions using natural language.",
-      "url": "https://huggingface.co/spaces/hoyiwan/spatchat-sdm"
+      "url": "https://hoyiwan-spatchat-sdm.hf.space"
     }
   ]
