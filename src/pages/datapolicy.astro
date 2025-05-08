@@ -1,57 +1,74 @@
 ---
-import Layout from '../layouts/layout.astro';
+import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Data Policy">
-  <section class="prose lg:prose-xl mx-auto py-12 px-4">
-    <h1>Spatchat.org Data Policy</h1>
-    <p><strong>Last Updated:</strong> 05/2025</p>
+  <section class="max-w-3xl mx-auto px-6 py-12 text-gray-800">
+    <h1 class="text-4xl font-bold mb-2">Spatchat.org Data Policy</h1>
+    <p class="text-sm text-gray-500 mb-10">Last Updated: 05/2025</p>
 
-    <h2>1. Data Collection & Use</h2>
-    <h3>User-Uploaded Data</h3>
-    <ul>
-      <li>GeoTIFFs, CSVs, or other spatial data uploaded for analysis are:</li>
-      <ul>
-        <li>Processed ephemerally (deleted after 7 days unless retained by user request).</li>
-        <li>Never used for training AI models without explicit opt-in.</li>
-      </ul>
-    </ul>
-    <h3>Cookies/Analytics</h3>
-    <ul>
-      <li>We use anonymized Google Analytics to improve UX (no personal identifiers).</li>
-    </ul>
+    <div class="space-y-10">
+      <div>
+        <h2 class="text-2xl font-semibold mb-2">1. Data Collection & Use</h2>
+        <h3 class="font-medium text-lg mt-4">User-Uploaded Data</h3>
+        <ul class="list-disc list-inside ml-4 text-base">
+          <li>GeoTIFFs, CSVs, or other spatial data uploaded for analysis are:
+            <ul class="list-disc list-inside ml-6 mt-1 text-sm text-gray-600">
+              <li>Processed ephemerally (deleted after 7 days unless retained by user request).</li>
+              <li>Never used for training AI models without explicit opt-in.</li>
+            </ul>
+          </li>
+        </ul>
+        <h3 class="font-medium text-lg mt-4">Cookies & Analytics</h3>
+        <ul class="list-disc list-inside ml-4 text-base">
+          <li>We use anonymized Google Analytics to improve UX (no personal identifiers).</li>
+        </ul>
+      </div>
 
-    <h2>2. Data Sharing & Ownership</h2>
-    <h3>User Control</h3>
-    <ul>
-      <li>By default, your data is private and never shared.</li>
-      <li>Opt-in to contribute anonymized datasets to:</li>
-      <ul>
-        <li>Public benchmarking (hosted on Dryad).</li>
-        <li>Open-source model improvement (via Hugging Face).</li>
-      </ul>
-    </ul>
+      <div>
+        <h2 class="text-2xl font-semibold mb-2">2. Data Sharing & Ownership</h2>
+        <ul class="list-disc list-inside ml-4 text-base">
+          <li>Your data is private by default and never shared.</li>
+          <li>You may opt-in to contribute anonymized datasets to:
+            <ul class="list-disc list-inside ml-6 mt-1 text-sm text-gray-600">
+              <li>Public benchmarking (hosted on <a href="https://datadryad.org" class="text-blue-600 hover:underline">Dryad</a>).</li>
+              <li>Open-source model improvement (via <a href="https://huggingface.co" class="text-blue-600 hover:underline">Hugging Face</a>).</li>
+            </ul>
+          </li>
+        </ul>
+      </div>
 
-    <h2>3. Code & AI Models</h2>
-    <ul>
-      <li><strong>All code:</strong> <a href="https://github.com" target="_blank">GitHub</a> (MIT License).</li>
-      <li><strong>AI models:</strong> <a href="https://huggingface.co" target="_blank">Hugging Face</a> (Apache 2.0).</li>
-      <li><strong>Permanent Archives:</strong> Major releases archived via Zenodo (DOI: 10.5281/zenodo.XXXX).</li>
-    </ul>
+      <div>
+        <h2 class="text-2xl font-semibold mb-2">3. Code & AI Models</h2>
+        <ul class="list-disc list-inside ml-4 text-base">
+          <li><strong>All code:</strong> <a href="https://github.com" class="text-blue-600 hover:underline">GitHub</a> (MIT License)</li>
+          <li><strong>AI models:</strong> <a href="https://huggingface.co" class="text-blue-600 hover:underline">Hugging Face</a> (Apache 2.0)</li>
+          <li><strong>Archives:</strong> Major releases archived via <a href="https://zenodo.org" class="text-blue-600 hover:underline">Zenodo</a> (DOI: 10.5281/zenodo.XXXX)</li>
+        </ul>
+      </div>
 
-    <h2>4. Security</h2>
-    <ul>
-      <li>Encryption: Data in transit (HTTPS) and at rest (AES-256).</li>
-      <li><strong>No Sensitive Data:</strong> Do not upload PII (e.g., field coordinates of endangered species).</li>
-    </ul>
+      <div>
+        <h2 class="text-2xl font-semibold mb-2">4. Security</h2>
+        <ul class="list-disc list-inside ml-4 text-base">
+          <li>Encryption in transit (HTTPS) and at rest (AES-256).</li>
+          <li><strong>Note:</strong> Do not upload PII (e.g., field coordinates of endangered species).</li>
+        </ul>
+      </div>
 
-    <h2>5. Compliance</h2>
-    <ul>
-      <li>Aligns with NSF data management requirements.</li>
-      <li>FAIR principles (Findable, Accessible, Interoperable, Reusable).</li>
-    </ul>
+      <div>
+        <h2 class="text-2xl font-semibold mb-2">5. Compliance</h2>
+        <ul class="list-disc list-inside ml-4 text-base">
+          <li>Aligned with NSF data management requirements.</li>
+          <li>Compliant with <abbr title="Findable, Accessible, Interoperable, Reusable" class="underline decoration-dotted cursor-help">FAIR</abbr> principles.</li>
+        </ul>
+      </div>
 
-    <h2>6. Contact</h2>
-    <p>Questions? Email <a href="mailto:spatchat.org@gmail.com">spatchat.org@gmail.com</a>.</p>
+      <div>
+        <h2 class="text-2xl font-semibold mb-2">6. Contact</h2>
+        <p class="text-base">
+          Questions? Email us at <a href="mailto:spatchat.org@gmail.com" class="text-blue-600 hover:underline">spatchat.org@gmail.com</a>.
+        </p>
+      </div>
+    </div>
   </section>
 </Layout>
