@@ -9,7 +9,7 @@
     {
       "id": "sdm",
       "title": "Species Distribution Modeling Chat Room",
-      "tags": ["SDM", "distributions", "MaxEnt", "presence"],
+      "tags": ["SDM", "distributions", "presence"],
       "description": "Model species distributions using natural language.",
       "url": "https://hoyiwan-spatchat-sdm.hf.space"
     }
