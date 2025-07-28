@@ -12,5 +12,11 @@
       "tags": ["SDM", "distributions", "presence"],
       "description": "Model species distributions using natural language.",
       "url": "https://hoyiwan-spatchat-sdm.hf.space"
-    }
+    },
+  {
+    "id": "homerange",
+    "title": "Home Range Estimation Chatbot",
+    "tags": ["movement", "home range", "wildlife"],
+    "description": "Interactively estimate animal home ranges using tracking data and AI."
+  }
   ]
