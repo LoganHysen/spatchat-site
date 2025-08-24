@@ -1,27 +1,27 @@
 [
     {
       "id": "landmetrics",
-      "title": "Landscape Metrics Chat Room",
+      "title": "Landscape Metrics Chat",
       "tags": ["landscape metrics", "configuration", "composition"],
       "description": "Analyze landscape patterns using natural language.",
       "url": "https://hoyiwan-spatchat.hf.space"
     },
     {
       "id": "sdm",
-      "title": "Species Distribution Modeling Chat Room",
+      "title": "Species Distribution Modeling Chat",
       "tags": ["SDM", "distributions", "presence"],
       "description": "Model species distributions using natural language.",
       "url": "https://hoyiwan-spatchat-sdm.hf.space"
     },
   {
     "id": "homerange",
-    "title": "Home Range Estimation Chatbot",
+    "title": "Home Range Estimation Chat",
     "tags": ["movement", "home range", "wildlife"],
     "description": "Interactively estimate animal home ranges using tracking data and AI."
   },
   {
     "id": "stats",
-    "title": "Foundational Statistics",
+    "title": "Basic Statistics Chat",
     "tags": ["stats", "GLM", "modelling", "statistics", "tests", "comparisons"],
     "description": "Perform statistical tests with the help of an AI assistant.",
     "url": "https://hoyiwan-spatchat-stats.hf.space"
