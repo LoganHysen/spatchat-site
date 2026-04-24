@@ -91,14 +91,19 @@ import chatbots from '../data/chatbots.json';
 
     if (room && bots[room]) {
       const section = document.getElementById("browse-section");
+      const main = document.querySelector("main");
       const bot = bots[room];
 
+      section.className = "w-full max-w-none px-0 py-8";
+      main?.classList.remove("container", "mx-auto", "p-8");
+      main?.classList.add("w-full", "p-0");
+
       section.innerHTML = `
-        <div class="max-w-6xl mx-auto text-center mb-4">
+        <div class="px-6 text-center mb-4">
           <h1 class="text-3xl font-bold mb-2">${bot.title}</h1>
           <a href="/browse" class="text-pink-600 underline hover:text-pink-800 text-sm">← Back to all chatbots</a>
         </div>
-        <div class="h-[90vh] w-full">
+        <div class="h-[90vh] w-full px-6">
           <div class="flex gap-4 justify-center mt-6">
             <button
               id="fullscreenBtn"
