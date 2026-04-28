@@ -30,7 +30,7 @@
   {
     "id": "connectivity",
     "title": "Connectivity Chat",
-    "tags": ["connectivity", "Circuitscape", "resistance"],
+    "tags": ["connectivity", "Circuitscape", "resistance", "least cost path"],
     "description": "Estimate landscape connectivity using resistance surfaces and AI assistance.",
     "url": "https://hoyiwan-spatchat-connect.hf.space"
   }
