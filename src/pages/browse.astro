@@ -5,7 +5,7 @@ import chatbots from '../data/chatbots.json';
 
 <Layout title="Browse Chatbots">
   <section id="browse-section" class="max-w-6xl mx-auto px-6 py-16 text-center">
-    <h1 class="text-4xl font-bold mb-10">🧠 Browse Spatchat Rooms</h1>
+    <h1 class="text-4xl font-bold mb-10">Browse Spatchat Rooms</h1>
     <p class="text-gray-600 text-lg mb-10 max-w-2xl mx-auto">
       Explore AI-powered spatial analysis rooms tailored to your research interests. Click a card to launch an interactive chat.
     </p>
@@ -31,125 +31,116 @@ import chatbots from '../data/chatbots.json';
     </div>
   </section>
 
-  <!-- JavaScript: Replace content based on ?room= param -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const bots = {
+        landmetrics: {
+          title: "Landscape Metrics Chat",
+          url: "https://hoyiwan-spatchat-landmetrics.hf.space",
+        },
+        sdm: {
+          title: "SDM Chat",
+          url: "https://hoyiwan-spatchat-sdm.hf.space"
+        },
+        homerange: {
+          title: "Animal Movement and Home Range Chat",
+          url: "https://hoyiwan-spatchat-move.hf.space"
+        },
+        stats: {
+          title: "Basic Statistics Chat",
+          url: "https://hoyiwan-spatchat-stats.hf.space"
+        },
+        connectivity: {
+          title: "Connectivity Chat",
+          url: "https://hoyiwan-spatchat-connect.hf.space"
+        }
+      };
 
-<!-- ✅ New non-module script to track clicks -->
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const bots = {
-      landmetrics: {
-        title: "Landscape Metrics Chat",
-        url: "https://hoyiwan-spatchat-landmetrics.hf.space",
-      },
-      sdm: {
-	title: "SDM Chat",
-	url: "https://hoyiwan-spatchat-sdm.hf.space"
-      },
-      homerange: {
-        title: "Animal Movement and Home Range Chat",
-        url: "https://hoyiwan-spatchat-move.hf.space"
-      },
-      stats: {
-        title: "Basic Statistics Chat",
-	url: "https://hoyiwan-spatchat-stats.hf.space"
-      },
-      connectivity : {
-        title: "Connectivity Chat",
-	url: "https://hoyiwan-spatchat-connect.hf.space"
-      }
-      // add more bots as needed
-    };
+      document.querySelectorAll(".bot-card").forEach(card => {
+        card.addEventListener("click", (e) => {
+          e.preventDefault();
 
-    // ✅ Click tracking for bot cards
-    document.querySelectorAll(".bot-card").forEach(card => {
-      card.addEventListener("click", (e) => {
-        e.preventDefault();
+          const botId = card.dataset.botId;
+          const href = card.getAttribute("href");
+          if (!botId || !href) return;
 
-        const botId = card.dataset.botId;
-        const href = card.getAttribute("href");
-        if (!botId || !href) return;
+          fetch("/.netlify/functions/track-clicks", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ botId }),
+          }).catch(err => {
+            console.error("Click tracking failed:", err);
+          });
 
-        // Send tracking request
-        fetch("/.netlify/functions/track-clicks", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ botId }),
-        }).catch(err => {
-          console.error("❌ Click tracking failed:", err);
+          setTimeout(() => {
+            window.location.href = href;
+          }, 150);
         });
-
-        // Slight delay before navigating
-        setTimeout(() => {
-          window.location.href = href;
-        }, 150);
       });
-    });
 
-    // ✅ Show iframe if room param exists
-    const params = new URLSearchParams(window.location.search);
-    const room = params.get("room");
+      const params = new URLSearchParams(window.location.search);
+      const room = params.get("room");
 
-    if (room && bots[room]) {
-      const section = document.getElementById("browse-section");
-      const main = document.querySelector("main");
-      const bot = bots[room];
+      if (room && bots[room]) {
+        const section = document.getElementById("browse-section");
+        const main = document.querySelector("main");
+        const bot = bots[room];
 
-      section.className = "w-full max-w-none px-0 py-8";
-      main?.classList.remove("container", "mx-auto", "p-8");
-      main?.classList.add("w-full", "p-0");
+        section.className = "w-full max-w-none px-0 py-8";
+        main?.classList.remove("container", "mx-auto", "p-8");
+        main?.classList.add("w-full", "p-0");
 
-      section.innerHTML = `
-        <div class="px-6 text-center mb-4">
-          <h1 class="text-3xl font-bold mb-2">${bot.title}</h1>
-          <a href="/browse" class="text-pink-600 underline hover:text-pink-800 text-sm">← Back to all chatbots</a>
-        </div>
-        <div class="h-[90vh] w-full px-6">
-          <div class="flex gap-4 justify-center mt-6">
-            <button
-              id="fullscreenBtn"
-              class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600 transition"
-            >
-              🔍 Fullscreen
-            </button>
-            <button
-              id="exitFullscreenBtn"
-              class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition hidden"
-            >
-              🔙 Collapse
-            </button>
+        section.innerHTML = `
+          <div class="px-6 text-center mb-4">
+            <h1 class="text-3xl font-bold">${bot.title}</h1>
           </div>
+          <div class="w-full px-6">
+            <iframe
+              id="bot-frame"
+              src="${bot.url}"
+              class="w-full h-[85vh] rounded-lg shadow-lg border"
+              allow="clipboard-write"
+              allowfullscreen
+            ></iframe>
 
-          <iframe
-            id="bot-frame"
-            src="${bot.url}"
-            class="w-full h-full rounded-lg shadow-lg border mt-4"
-            allow="clipboard-write"
-            allowfullscreen
-          ></iframe>
-        </div>
-      `;
+            <div class="flex flex-wrap gap-4 justify-center mt-6">
+              <a href="/browse" class="px-4 py-2 text-pink-600 underline hover:text-pink-800 text-sm">Back to all chatbots</a>
+              <button
+                id="fullscreenBtn"
+                class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600 transition"
+              >
+                Fullscreen
+              </button>
+              <button
+                id="exitFullscreenBtn"
+                class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition hidden"
+              >
+                Collapse
+              </button>
+            </div>
+          </div>
+        `;
 
-      // Fullscreen logic
-      setTimeout(() => {
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
-        const exitFullscreenBtn = document.getElementById('exitFullscreenBtn');
-        const iframe = document.getElementById('bot-frame');
+        setTimeout(() => {
+          const fullscreenBtn = document.getElementById("fullscreenBtn");
+          const exitFullscreenBtn = document.getElementById("exitFullscreenBtn");
+          const iframe = document.getElementById("bot-frame");
 
-        fullscreenBtn?.addEventListener('click', () => {
-          iframe?.requestFullscreen?.();
-        });
+          fullscreenBtn?.addEventListener("click", () => {
+            iframe?.requestFullscreen?.();
+          });
 
-        exitFullscreenBtn?.addEventListener('click', () => {
-          document.exitFullscreen?.();
-        });
+          exitFullscreenBtn?.addEventListener("click", () => {
+            document.exitFullscreen?.();
+          });
 
-        document.addEventListener('fullscreenchange', () => {
-          const isFullscreen = document.fullscreenElement !== null;
-          fullscreenBtn?.classList.toggle('hidden', isFullscreen);
-          exitFullscreenBtn?.classList.toggle('hidden', !isFullscreen);
-        });
-      }, 100);
-    }
-  });
-</script>
+          document.addEventListener("fullscreenchange", () => {
+            const isFullscreen = document.fullscreenElement !== null;
+            fullscreenBtn?.classList.toggle("hidden", isFullscreen);
+            exitFullscreenBtn?.classList.toggle("hidden", !isFullscreen);
+          });
+        }, 100);
+      }
+    });
+  </script>
 </Layout>
