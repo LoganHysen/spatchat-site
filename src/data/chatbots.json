@@ -14,7 +14,7 @@
       "url": "https://hoyiwan-spatchat-sdm.hf.space"
     },
   {
-    "id": "homerange",
+    "id": "move",
     "title": "Animal Movement and Home Range Chat",
     "tags": ["movement", "home range", "wildlife"],
     "description": "Interactively estimate animal home ranges using tracking data and AI.",
@@ -30,7 +30,7 @@
   {
     "id": "connectivity",
     "title": "Connectivity Chat",
-    "tags": ["connectivity", "Circuitscape", "resistance", "least cost path"],
+    "tags": ["connectivity", "Circuitscape", "resistance", "Least cost path"],
     "description": "Estimate landscape connectivity using resistance surfaces and AI assistance.",
     "url": "https://hoyiwan-spatchat-connect.hf.space"
   }
