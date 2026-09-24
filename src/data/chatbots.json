@@ -11,7 +11,7 @@
       "title": "Species Distribution Modeling Chat",
       "tags": ["SDM", "distributions", "presence"],
       "description": "Model species distributions using natural language.",
-      "url": "https://spatchat-sdm.onrender.com"
+      "url": "https://hoyiwan-spatchat-sdm.hf.space"
     },
   {
     "id": "move",
@@ -25,7 +25,7 @@
     "title": "Basic Statistics Chat",
     "tags": ["stats", "GLM", "modelling", "statistics", "tests", "comparisons"],
     "description": "Perform statistical tests with the help of an AI assistant.",
-    "url": "https://spatchat-test.onrender.com"
+    "url": "https://hoyiwan-spatchat-stats.hf.space"
   },
   {
     "id": "connectivity",
