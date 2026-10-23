@@ -40,19 +40,28 @@ import chatbots from '../data/chatbots.json';
         },
         sdm: {
           title: "SDM Chat",
-          url: "https://hoyiwan-spatchat-sdm.hf.space"
+          url: "https://hoyiwan-spatchat-sdm.hf.space",
+          showTitle: false,
+          seamless: true
         },
         move: {
           title: "Animal Movement and Home Range Chat",
-          url: "https://hoyiwan-spatchat-move.hf.space"
+          url: "https://hoyiwan-spatchat-move.hf.space",
+          // The Move room draws its own title, so the page skips its heading and frame styling.
+          showTitle: false,
+          seamless: true
         },
         stats: {
           title: "Basic Statistics Chat",
-          url: "https://hoyiwan-spatchat-stats.hf.space"
+          url: "https://hoyiwan-spatchat-stats.hf.space",
+          showTitle: false,
+          seamless: true
         },
         connectivity: {
           title: "Connectivity Chat",
-          url: "https://hoyiwan-spatchat-connect.hf.space"
+          url: "https://hoyiwan-spatchat-connect.hf.space",
+          showTitle: false,
+          seamless: true
         }
       };
 
@@ -86,19 +95,24 @@ import chatbots from '../data/chatbots.json';
         const main = document.querySelector("main");
         const bot = bots[room];
 
-        section.className = "w-full max-w-none px-0 py-8";
+        // Local testing only: ?src=http://127.0.0.1:7861 points the frame at a local room.
+        const override = params.get("src");
+        const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+        const frameUrl = isLocal && override ? override : bot.url;
+
+        section.className = bot.seamless ? "w-full max-w-none px-0 py-3" : "w-full max-w-none px-0 py-8";
         main?.classList.remove("container", "mx-auto", "p-8");
         main?.classList.add("w-full", "p-0");
 
         section.innerHTML = `
-          <div class="px-6 text-center mb-4">
+          ${bot.showTitle === false ? "" : `<div class="px-6 text-center mb-4">
             <h1 class="text-3xl font-bold">${bot.title}</h1>
-          </div>
+          </div>`}
           <div class="w-full px-6">
             <iframe
               id="bot-frame"
-              src="${bot.url}"
-              class="w-full h-[85vh] rounded-lg shadow-lg border"
+              src="${frameUrl}"
+              class="${bot.seamless ? "w-full h-[calc(100vh-8rem)] min-h-[600px] border-0" : "w-full h-[85vh] rounded-lg shadow-lg border"}"
               allow="clipboard-write"
               allowfullscreen
             ></iframe>
