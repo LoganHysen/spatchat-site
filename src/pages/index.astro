@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/layout.astro';
+const gateway = (import.meta.env.PUBLIC_GATEWAY_URL ?? "").replace(/\/$/, "");
 ---
 
 <Layout title="Spatchat">
@@ -16,6 +17,13 @@ import Layout from '../layouts/layout.astro';
     <p class="text-lg text-black max-w-xl mx-auto mb-8">
       Spatchat.org is an open, extendable platform for conversational spatial analysis, powered by artificial intelligence and large language models.
     </p>
+    {gateway ? (
+      <div class="flex flex-wrap gap-4 justify-center">
+        <a href={`${gateway}/signup`} class="inline-block bg-pink-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-pink-600 transition">Sign up free</a>
+        <a href={`${gateway}/login`} class="inline-block bg-white text-pink-600 border border-pink-300 px-6 py-3 rounded-lg text-lg hover:bg-pink-50 transition">Log in</a>
+        <a href="/browse" class="inline-block bg-pink-400 text-white px-6 py-3 rounded-lg text-lg hover:bg-pink-500 transition">Browse Rooms 🚀</a>
+      </div>
+    ) : (
     <a
       href="/browse"
       target="_blank"
@@ -23,6 +31,7 @@ import Layout from '../layouts/layout.astro';
     >
       Browse Available Spatchat Rooms 🚀
     </a>
+    )}
   </div>
 </section>
 

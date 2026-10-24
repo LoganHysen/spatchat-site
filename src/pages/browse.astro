@@ -33,6 +33,10 @@ import chatbots from '../data/chatbots.json';
 
   <script>
     document.addEventListener("DOMContentLoaded", () => {
+      // With PUBLIC_GATEWAY_URL set, rooms open through the gateway (login, limits) instead of a frame.
+      const GATEWAY = (import.meta.env.PUBLIC_GATEWAY_URL ?? "").replace(/\/$/, "");
+      const gatewayRoom = { sdm: "sdm", move: "move", stats: "stats", connectivity: "connect" };
+
       const bots = {
         landmetrics: {
           title: "Landscape Metrics Chat",
@@ -89,6 +93,11 @@ import chatbots from '../data/chatbots.json';
 
       const params = new URLSearchParams(window.location.search);
       const room = params.get("room");
+
+      if (GATEWAY && room && gatewayRoom[room]) {
+        window.location.replace(`${GATEWAY}/${gatewayRoom[room]}/`);
+        return;
+      }
 
       if (room && bots[room]) {
         const section = document.getElementById("browse-section");
