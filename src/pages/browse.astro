@@ -1,177 +1,70 @@
 ---
 import Layout from '../layouts/layout.astro';
 import chatbots from '../data/chatbots.json';
+
+// Rooms open through the gateway (login first). Landscape Metrics is not behind the gateway yet.
+const gateway = (import.meta.env.PUBLIC_GATEWAY_URL ?? "").replace(/\/$/, "");
+const slug: Record<string, string> = { sdm: "sdm", move: "move", stats: "stats", connectivity: "connect" };
+const rooms = chatbots.map((bot) => ({
+  ...bot,
+  href: gateway && slug[bot.id] ? `${gateway}/${slug[bot.id]}/` : null,
+}));
 ---
 
-<Layout title="Browse Chatbots">
-  <section id="browse-section" class="max-w-6xl mx-auto px-6 py-16 text-center">
-    <h1 class="text-4xl font-bold mb-10">Browse Spatchat Rooms</h1>
-    <p class="text-gray-600 text-lg mb-10 max-w-2xl mx-auto">
-      Explore AI-powered spatial analysis rooms tailored to your research interests. Click a card to launch an interactive chat.
-    </p>
+<Layout title="Rooms · Spatchat">
+  <section class="max-w-6xl mx-auto py-10">
+    <div class="text-center mb-10">
+      <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">Spatchat rooms</h1>
+      <p class="text-slate-600 max-w-2xl mx-auto">
+        Pick a room and start chatting. You'll be asked to log in first.
+      </p>
+    </div>
 
-    <div id="chatbot-grid" class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-      {chatbots.map(bot => (
-        <a
-          href={`/browse?room=${bot.id}`}
-          class="bot-card block bg-white shadow-md rounded-2xl p-8 hover:shadow-2xl transition text-left border border-gray-100 h-full"
-          data-bot-id={bot.id}
-        >
-          <h2 class="text-2xl font-bold mb-4 text-pink-700">{bot.title}</h2>
-
-          <div class="flex flex-wrap gap-2 text-sm mb-6">
-            {bot.tags.map(tag => (
-              <span class="bg-pink-100 text-pink-700 px-3 py-1 rounded-full">{tag}</span>
-            ))}
+    <div class="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      {rooms.map((room) =>
+        room.href ? (
+          <a
+            href={room.href}
+            data-bot-id={room.id}
+            class="bot-card block bg-white rounded-2xl border border-slate-200 p-6 hover:border-teal-600 hover:shadow-lg transition h-full"
+          >
+            <h2 class="text-xl font-bold text-slate-900 mb-3">{room.title}</h2>
+            <div class="flex flex-wrap gap-2 text-xs mb-4">
+              {room.tags.map((tag) => (
+                <span class="bg-teal-50 text-teal-800 px-2.5 py-1 rounded-full">{tag}</span>
+              ))}
+            </div>
+            <p class="text-slate-600 text-sm leading-relaxed">{room.description}</p>
+          </a>
+        ) : (
+          <div class="block bg-white/60 rounded-2xl border border-dashed border-slate-300 p-6 h-full">
+            <div class="flex items-start justify-between gap-3 mb-3">
+              <h2 class="text-xl font-bold text-slate-500">{room.title}</h2>
+              <span class="shrink-0 text-xs bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full">Coming soon</span>
+            </div>
+            <p class="text-slate-500 text-sm leading-relaxed">{room.description}</p>
           </div>
-
-          <p class="text-gray-700 text-base leading-relaxed">{bot.description}</p>
-        </a>
-      ))}
+        )
+      )}
     </div>
   </section>
 
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // With PUBLIC_GATEWAY_URL set, rooms open through the gateway (login, limits) instead of a frame.
-      const GATEWAY = (import.meta.env.PUBLIC_GATEWAY_URL ?? "").replace(/\/$/, "");
-      const gatewayRoom = { sdm: "sdm", move: "move", stats: "stats", connectivity: "connect" };
-
-      const bots = {
-        landmetrics: {
-          title: "Landscape Metrics Chat",
-          url: "https://hoyiwan-spatchat-landmetrics.hf.space",
-          showTitle: false,
-          seamless: true,
-        },
-        sdm: {
-          title: "SDM Chat",
-          url: "https://hoyiwan-spatchat-sdm.hf.space",
-          showTitle: false,
-          seamless: true
-        },
-        move: {
-          title: "Animal Movement and Home Range Chat",
-          url: "https://hoyiwan-spatchat-move.hf.space",
-          // The Move room draws its own title, so the page skips its heading and frame styling.
-          showTitle: false,
-          seamless: true
-        },
-        stats: {
-          title: "Basic Statistics Chat",
-          url: "https://hoyiwan-spatchat-stats.hf.space",
-          showTitle: false,
-          seamless: true
-        },
-        connectivity: {
-          title: "Connectivity Chat",
-          url: "https://hoyiwan-spatchat-connect.hf.space",
-          showTitle: false,
-          seamless: true
-        }
-      };
-
-      document.querySelectorAll(".bot-card").forEach(card => {
-        card.addEventListener("click", (e) => {
-          e.preventDefault();
-
-          const botId = card.dataset.botId;
-          const href = card.getAttribute("href");
-          if (!botId || !href) return;
-
-          fetch("/.netlify/functions/track-clicks", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ botId }),
-          }).catch(err => {
-            console.error("Click tracking failed:", err);
-          });
-
-          setTimeout(() => {
-            window.location.href = href;
-          }, 150);
-        });
+    // Count the click without delaying the page change.
+    document.querySelectorAll(".bot-card").forEach((card) => {
+      card.addEventListener("click", () => {
+        const botId = (card as HTMLElement).dataset.botId;
+        if (!botId) return;
+        try {
+          navigator.sendBeacon("/.netlify/functions/track-clicks", new Blob([JSON.stringify({ botId })], { type: "application/json" }));
+        } catch {}
       });
-
-      const params = new URLSearchParams(window.location.search);
-      const room = params.get("room");
-
-      // With a gateway configured, never embed a room directly: everything goes through login.
-      if (GATEWAY && room) {
-        window.location.replace(gatewayRoom[room] ? `${GATEWAY}/${gatewayRoom[room]}/` : `${GATEWAY}/login`);
-        return;
-      }
-
-      if (room && bots[room]) {
-        const section = document.getElementById("browse-section");
-        const main = document.querySelector("main");
-        const bot = bots[room];
-
-        // Local testing only: ?src=http://127.0.0.1:7861 points the frame at a local room.
-        const override = params.get("src");
-        const isLocal = ["localhost", "127.0.0.1"].includes(window.location.hostname);
-        const frameUrl = isLocal && override ? override : bot.url;
-
-        section.className = bot.seamless ? "w-full max-w-none px-0 py-0" : "w-full max-w-none px-0 py-8";
-        main?.classList.remove("container", "mx-auto", "p-8");
-        main?.classList.add("w-full", "p-0");
-        // The room draws its own top bar (logo, name, links), so the site header and footer would be a second banner.
-        if (bot.seamless) {
-          document.querySelector("header")?.classList.add("hidden");
-          document.querySelector("footer")?.classList.add("hidden");
-        }
-
-        section.innerHTML = `
-          ${bot.showTitle === false ? "" : `<div class="px-6 text-center mb-4">
-            <h1 class="text-3xl font-bold">${bot.title}</h1>
-          </div>`}
-          <div class="${bot.seamless ? "w-full px-3 py-2" : "w-full px-6"}">
-            <iframe
-              id="bot-frame"
-              src="${frameUrl}"
-              class="${bot.seamless ? "w-full h-[calc(100vh-1rem)] min-h-[560px] border-0" : "w-full h-[85vh] rounded-lg shadow-lg border"}"
-              allow="clipboard-write"
-              allowfullscreen
-            ></iframe>
-
-            ${bot.seamless ? "" : `<div class="flex flex-wrap gap-4 justify-center mt-6">
-              <a href="/browse" class="px-4 py-2 text-pink-600 underline hover:text-pink-800 text-sm">Back to all chatbots</a>
-              <button
-                id="fullscreenBtn"
-                class="px-4 py-2 bg-pink-500 text-white rounded hover:bg-pink-600 transition"
-              >
-                Fullscreen
-              </button>
-              <button
-                id="exitFullscreenBtn"
-                class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition hidden"
-              >
-                Collapse
-              </button>
-            </div>`}
-          </div>
-        `;
-
-        setTimeout(() => {
-          const fullscreenBtn = document.getElementById("fullscreenBtn");
-          const exitFullscreenBtn = document.getElementById("exitFullscreenBtn");
-          const iframe = document.getElementById("bot-frame");
-
-          fullscreenBtn?.addEventListener("click", () => {
-            iframe?.requestFullscreen?.();
-          });
-
-          exitFullscreenBtn?.addEventListener("click", () => {
-            document.exitFullscreen?.();
-          });
-
-          document.addEventListener("fullscreenchange", () => {
-            const isFullscreen = document.fullscreenElement !== null;
-            fullscreenBtn?.classList.toggle("hidden", isFullscreen);
-            exitFullscreenBtn?.classList.toggle("hidden", !isFullscreen);
-          });
-        }, 100);
-      }
     });
+
+    // Old bookmarks like /browse?room=sdm go straight to the room (the gateway asks for login).
+    const gateway = (document.body.dataset.gateway ?? "");
+    const map: Record<string, string> = { sdm: "sdm", move: "move", stats: "stats", connectivity: "connect" };
+    const room = new URLSearchParams(location.search).get("room");
+    if (gateway && room && map[room]) location.replace(`${gateway}/${map[room]}/`);
   </script>
 </Layout>

@@ -17,26 +17,17 @@ const gateway = (import.meta.env.PUBLIC_GATEWAY_URL ?? "").replace(/\/$/, "");
     <p class="text-lg text-black max-w-xl mx-auto mb-8">
       Spatchat.org is an open, extendable platform for conversational spatial analysis, powered by artificial intelligence and large language models.
     </p>
-    {gateway ? (
-      <div class="flex flex-wrap gap-4 justify-center">
-        <a href={`${gateway}/signup`} class="inline-block bg-pink-500 text-white px-6 py-3 rounded-lg text-lg hover:bg-pink-600 transition">Sign up free</a>
-        <a href={`${gateway}/login`} class="inline-block bg-white text-pink-600 border border-pink-300 px-6 py-3 rounded-lg text-lg hover:bg-pink-50 transition">Log in</a>
-        <a href="/browse" class="inline-block bg-pink-400 text-white px-6 py-3 rounded-lg text-lg hover:bg-pink-500 transition">Browse Rooms 🚀</a>
-      </div>
-    ) : (
-    <a
-      href="/browse"
-      target="_blank"
-      class="inline-block bg-pink-400 text-white px-6 py-3 rounded-lg text-lg hover:bg-pink-500 transition"
-    >
-      Browse Available Spatchat Rooms 🚀
-    </a>
-    )}
+    <div class="flex flex-wrap gap-3 justify-center">
+      <a href="/browse" class="inline-block bg-teal-700 text-white px-7 py-3 rounded-lg text-lg font-medium hover:bg-teal-800 transition">Browse rooms</a>
+      {gateway && (
+        <a data-guest-only href={`${gateway}/signup`} class="inline-block bg-white text-teal-800 border border-teal-300 px-7 py-3 rounded-lg text-lg font-medium hover:bg-teal-50 transition">Sign up free</a>
+      )}
+    </div>
   </div>
 </section>
 
 
-<section class="bg-pink-50 py-16">
+<section class="bg-teal-50 py-16">
   <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 text-center px-6">
     <div>
       <span class="text-4xl">🧠</span>
@@ -61,7 +52,7 @@ const gateway = (import.meta.env.PUBLIC_GATEWAY_URL ?? "").replace(/\/$/, "");
 <div class="h8"></div>
 
 <!-- Gradient + transparent pink section -->
-<section class="bg-gradient-to-r from-pink-100/60 to-pink-200/40 backdrop-blur-sm rounded-xl shadow-inner">
+<section class="bg-gradient-to-r from-teal-100/70 to-teal-100/50 backdrop-blur-sm rounded-xl shadow-inner">
   <div class="max-w-6xl mx-auto px-6 py-20 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
     <!-- 🖼️ Image -->
     <img
@@ -84,8 +75,8 @@ const gateway = (import.meta.env.PUBLIC_GATEWAY_URL ?? "").replace(/\/$/, "");
 <div class="h-14"></div>
 
 <!-- 🌟 Quick Start Section -->
-<div class="bg-pink-50/60 p-8 rounded-xl shadow-md">
-  <h2 class="text-2xl font-bold text-pink-700 mb-4">Quick Start</h2>
+<div class="bg-teal-50 p-8 rounded-xl shadow-md">
+  <h2 class="text-2xl font-bold text-teal-800 mb-4">Quick Start</h2>
   <p class="text-gray-700 mb-4">
     Ready to dive in? Here’s how to get up and running with Spatchat in under a minute.
   </p>
@@ -95,7 +86,7 @@ const gateway = (import.meta.env.PUBLIC_GATEWAY_URL ?? "").replace(/\/$/, "");
     <li>Drag and drop a raster or shapefile into the interface.</li>
     <li>Start typing your questions about the landscape.</li>
     <li>Explore outputs and tweak your analysis interactively.</li>
-    <li> Check out the <a href="/docs" class="text-pink-600 underline hover:text-pink-800">documentation page</a> to explore tutorials, papers, and more.</li>
+    <li> Check out the <a href="/docs" class="text-teal-700 underline hover:text-teal-900">documentation page</a> to explore tutorials, papers, and more.</li>
   </ol>
 </div>
 
