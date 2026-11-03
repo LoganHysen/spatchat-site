@@ -2,9 +2,9 @@
 import Layout from '../layouts/layout.astro';
 import chatbots from '../data/chatbots.json';
 
-// Rooms open through the gateway (login first). Landscape Metrics is not behind the gateway yet.
+// Every room opens through the gateway (login first). A room missing from this map shows as Coming soon.
 const gateway = (import.meta.env.PUBLIC_GATEWAY_URL ?? "").replace(/\/$/, "");
-const slug: Record<string, string> = { sdm: "sdm", move: "move", stats: "stats", connectivity: "connect" };
+const slug: Record<string, string> = { sdm: "sdm", move: "move", stats: "stats", connectivity: "connect", landmetrics: "landmetrics" };
 const rooms = chatbots.map((bot) => ({
   ...bot,
   href: gateway && slug[bot.id] ? `${gateway}/${slug[bot.id]}/` : null,
@@ -63,7 +63,7 @@ const rooms = chatbots.map((bot) => ({
 
     // Old bookmarks like /browse?room=sdm go straight to the room (the gateway asks for login).
     const gateway = (document.body.dataset.gateway ?? "");
-    const map: Record<string, string> = { sdm: "sdm", move: "move", stats: "stats", connectivity: "connect" };
+    const map: Record<string, string> = { sdm: "sdm", move: "move", stats: "stats", connectivity: "connect", landmetrics: "landmetrics" };
     const room = new URLSearchParams(location.search).get("room");
     if (gateway && room && map[room]) location.replace(`${gateway}/${map[room]}/`);
   </script>
