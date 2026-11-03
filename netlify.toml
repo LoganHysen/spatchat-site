@@ -4,3 +4,11 @@
 
 [functions]
   directory = "netlify/functions"
+
+# app.spatchat.org is a domain alias of this site. Requests on that host are proxied to the
+# SpatChat gateway (login + rooms), so users never see an hf.space address.
+[[redirects]]
+  from = "https://app.spatchat.org/*"
+  to = "https://hoyiwan-spatchat-gateway.hf.space/:splat"
+  status = 200
+  force = true

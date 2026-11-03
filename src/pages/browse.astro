@@ -96,8 +96,9 @@ import chatbots from '../data/chatbots.json';
       const params = new URLSearchParams(window.location.search);
       const room = params.get("room");
 
-      if (GATEWAY && room && gatewayRoom[room]) {
-        window.location.replace(`${GATEWAY}/${gatewayRoom[room]}/`);
+      // With a gateway configured, never embed a room directly: everything goes through login.
+      if (GATEWAY && room) {
+        window.location.replace(gatewayRoom[room] ? `${GATEWAY}/${gatewayRoom[room]}/` : `${GATEWAY}/login`);
         return;
       }
 
