@@ -26,12 +26,12 @@ const rooms = chatbots.map((bot) => ({
           <a
             href={room.href}
             data-bot-id={room.id}
-            class="bot-card block bg-white rounded-2xl border border-slate-200 p-6 hover:border-teal-600 hover:shadow-lg transition h-full"
+            class="bot-card block bg-white rounded-2xl border border-slate-200 p-6 hover:border-brand-600 hover:shadow-lg transition h-full"
           >
             <h2 class="text-xl font-bold text-slate-900 mb-3">{room.title}</h2>
             <div class="flex flex-wrap gap-2 text-xs mb-4">
               {room.tags.map((tag) => (
-                <span class="bg-teal-50 text-teal-800 px-2.5 py-1 rounded-full">{tag}</span>
+                <span class="bg-brand-50 text-brand-800 px-2.5 py-1 rounded-full">{tag}</span>
               ))}
             </div>
             <p class="text-slate-600 text-sm leading-relaxed">{room.description}</p>

@@ -1,1 +1,15 @@
 @import "tailwindcss";
+
+/* The Spatchat pink (from the logo) replaces Tailwind's teal everywhere on the site. Use `brand-*` classes. */
+@theme {
+  --color-brand-50: #fff1f6;
+  --color-brand-100: #ffe3ed;
+  --color-brand-200: #ffcadb;
+  --color-brand-300: #ffadc7;
+  --color-brand-400: #ff8db3;
+  --color-brand-500: #fd7ba7;
+  --color-brand-600: #fb749f;
+  --color-brand-700: #fa6a98;   /* buttons */
+  --color-brand-800: #d94a80;   /* button hover, headings, links */
+  --color-brand-900: #a8305f;   /* link hover */
+}
