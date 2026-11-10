@@ -18,7 +18,7 @@ const gateway = (import.meta.env.PUBLIC_GATEWAY_URL ?? "").replace(/\/$/, "");
       Spatchat.org is an open, extendable platform for conversational spatial analysis, powered by artificial intelligence and large language models.
     </p>
     <div class="flex flex-wrap gap-3 justify-center">
-      <a href="/browse" class="inline-block bg-brand-700 text-white px-7 py-3 rounded-lg text-lg font-medium hover:bg-brand-800 transition">Browse rooms</a>
+      <a href="/browse" class="inline-block bg-brand-700 text-white px-7 py-3 rounded-lg text-lg font-medium hover:bg-brand-800 transition">Get started</a>
       {gateway && (
         <a data-guest-only href={`${gateway}/signup`} class="inline-block bg-white text-brand-800 border border-brand-300 px-7 py-3 rounded-lg text-lg font-medium hover:bg-cream-100 transition">Sign up free</a>
       )}
@@ -85,7 +85,7 @@ const gateway = (import.meta.env.PUBLIC_GATEWAY_URL ?? "").replace(/\/$/, "");
     Ready to dive in? Here’s how to get up and running with Spatchat in under a minute.
   </p>
   <ol class="list-decimal list-inside text-gray-800 space-y-2">
-    <li>Browse available rooms (e.g., landscape metrics assistant, SDM assistant) using the button above or navigate to the "Browse Rooms" page.</li>
+    <li>Browse available rooms (e.g., landscape metrics assistant, SDM assistant) using the "Get started" button above or the "Rooms" page.</li>
     <li>Launch the room that best meets your needs.</li>
     <li>Drag and drop a raster or shapefile into the interface.</li>
     <li>Start typing your questions about the landscape.</li>
