@@ -1,78 +1,529 @@
 ---
 import Layout from '../layouts/layout.astro';
+import Icon from '../components/Icon.astro';
+
+// Rooms open through the gateway (login first); without a gateway configured they link to the Rooms page.
+const gateway = (import.meta.env.PUBLIC_GATEWAY_URL ?? "").replace(/\/$/, "");
+const roomHref = (slug: string) => (gateway ? `${gateway}/${slug}/` : "/browse");
+
+const steps = [
+  {
+    icon: "upload",
+    title: "Bring your data",
+    text: "Drop in a CSV of locations or GPS tracks, or a GeoTIFF raster. No data yet? Every room has sample data to explore.",
+  },
+  {
+    icon: "message",
+    title: "Ask in plain language",
+    text: "Type what you want: “I want 95 KDE”, “Fetch elevation and NDVI”, “Compare class 1 and 2”. The assistant works out which analysis to run.",
+  },
+  {
+    icon: "chart",
+    title: "Get results you can use",
+    text: "Maps, plots and tables appear next to the chat, ready to download. Follow up to refine, compare or dig deeper.",
+  },
+];
+
+const rooms = [
+  {
+    slug: "move",
+    icon: "compass",
+    name: "Animal Movement & Home Range",
+    question: "How big is an animal’s home range, and how does it use it?",
+    forWho: "Wildlife biologists working with GPS or telemetry tracks",
+    prompts: ["I want 95 KDE", "Run AKDE 50 and 95", "Behavioral states (HMM)"],
+    gets: [
+      "Home ranges: MCP, KDE, AKDE, LoCoH and dBBMM",
+      "Step lengths, turning angles and autocorrelation",
+      "Hidden Markov behavioral states",
+    ],
+  },
+  {
+    slug: "sdm",
+    icon: "leaf",
+    name: "Species Distribution Modeling",
+    question: "Where is a species likely to occur?",
+    forWho: "Ecologists with presence locations and an environmental question",
+    prompts: ["Fetch bio1, elevation and NDVI", "Run logistic regression", "Check multicollinearity"],
+    gets: [
+      "Environmental layers fetched for you: climate, terrain, vegetation",
+      "Model performance, coefficients and effect plots",
+      "Checks for correlated predictors and spatial autocorrelation",
+    ],
+  },
+  {
+    slug: "connect",
+    icon: "route",
+    name: "Landscape Connectivity",
+    question: "How can animals move between habitat patches?",
+    forWho: "Conservation planners with a habitat or resistance surface",
+    prompts: ["Least-cost paths", "Cumulative resistant kernels", "Graph connectivity"],
+    gets: [
+      "Least-cost corridors between your sites",
+      "Resistant-kernel and circuit-style analyses",
+      "Network metrics for habitat patches",
+    ],
+  },
+  {
+    slug: "landmetrics",
+    icon: "grid",
+    name: "Landscape Metrics",
+    question: "What does this landscape look like in numbers?",
+    forWho: "Landscape ecologists with a land-cover raster",
+    prompts: ["PLAND for all classes", "SHDI at the landscape level", "Edge density (ED)"],
+    gets: [
+      "Patch-, class- and landscape-level metrics",
+      "Composition and configuration at a glance",
+      "Calculated with PyLandStats",
+    ],
+  },
+  {
+    slug: "stats",
+    icon: "chart",
+    name: "Basic Statistics",
+    question: "Is this difference real?",
+    forWho: "Students and researchers who want guidance, not just output",
+    prompts: ["Quick summary", "ANOVA (+Tukey)", "Correlations"],
+    gets: [
+      "t-tests, ANOVA, non-parametric tests, correlation and regression",
+      "Plots and tables with plain-language guidance",
+      "Power analysis for planning a study",
+    ],
+  },
+];
+
+const audiences = [
+  {
+    icon: "compass",
+    title: "Field biologists & researchers",
+    text: "Skip the scripting. Go from a GPS file to a home range, or from presence points to a habitat map, in one conversation.",
+  },
+  {
+    icon: "map",
+    title: "Conservation planners & land managers",
+    text: "Answer corridor, connectivity and habitat questions, with results you can explain to stakeholders and download for your records.",
+  },
+  {
+    icon: "cap",
+    title: "Educators & students",
+    text: "Teach spatial ecology without a programming prerequisite. Learners explore ideas first and pick up the code behind them later, even in high school.",
+  },
+  {
+    icon: "code",
+    title: "Developers & tool builders",
+    text: "Rooms are modular. Put a model or workflow behind a chat interface and share it with the community.",
+  },
+];
+
+const pipeline = [
+  { icon: "message", title: "You ask", text: "A lightweight chat interface that can live in a website, a notebook or an app." },
+  { icon: "sparkles", title: "A language model interprets", text: "It works out which analysis you mean and with what settings." },
+  { icon: "code", title: "Analysis code runs", text: "Python libraries such as PyLandStats, scikit-learn and statsmodels, plus Google Earth Engine, do the computing." },
+  { icon: "map", title: "You get results", text: "Maps, charts and tables come back in the room and can be downloaded." },
+];
+
+const faqs = [
+  {
+    q: "Do I need to know how to code?",
+    a: "No. You describe what you want in plain language and Spatchat runs the analysis. If you like to see how things work, the rooms are open source on GitHub.",
+  },
+  {
+    q: "What kinds of data can I use?",
+    a: "Rooms accept CSV files of locations or tracks and GeoTIFF rasters, and where it helps they fetch environmental layers for you. Each room says what it expects, and the built-in sample data lets you try it first.",
+  },
+  {
+    q: "Is my data private?",
+    a: "Our Data Policy explains exactly how uploaded data is handled.",
+    link: { href: "/datapolicy", label: "Read the Data Policy" },
+  },
+  {
+    q: "Does it cost anything?",
+    a: "You can start for free. Chat messages come with a monthly allowance, and a paid plan is available if you need more. Create an account to see the current limits.",
+  },
+  {
+    q: "Can I add my own room or tool?",
+    a: "Yes. Spatchat is built for community-contributed rooms. Explore the code on GitHub and get in touch through the Team page.",
+    link: { href: "https://github.com/Spatchat-org", label: "Spatchat on GitHub" },
+  },
+];
+
+// A fixed, pseudo-random scatter of "GPS fixes" for the illustration (deterministic so builds are reproducible).
+let seed = 11;
+const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const fixes = Array.from({ length: 54 }, () => {
+  const angle = rnd() * Math.PI * 2;
+  const radius = Math.pow(rnd(), 0.75) * 54;
+  return [110 + Math.cos(angle) * radius * 1.15, 112 + Math.sin(angle) * radius * 0.85] as [number, number];
+});
+const track = fixes.slice(0, 26).map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
 ---
 
 <Layout title="About Spatchat">
-  <!-- Hero -->
-  <section class="text-center py-20 bg-gradient-to-r from-cream-100 to-cream-50">
-    <h1 class="text-5xl font-extrabold text-gray-800 mb-4">About Spatchat</h1>
-    <p class="text-xl text-gray-700 max-w-3xl mx-auto">
-      An AI-powered natural language platform for spatial intelligence and ecological modeling.
+  <!-- Mark the page as script-enabled before anything below is painted, so the reveal effect never flashes. -->
+  <script is:inline>document.documentElement.classList.add("js");</script>
+
+  <!-- ============================ Hero ============================ -->
+  <section class="relative overflow-hidden rounded-3xl border border-cream-200 bg-gradient-to-br from-brand-50 via-cream-50 to-cream-100 px-6 py-14 sm:px-12 sm:py-20">
+    <div class="pointer-events-none absolute -top-24 -right-24 h-72 w-72 rounded-full bg-brand-200/50 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-32 -left-16 h-72 w-72 rounded-full bg-brand-100/70 blur-3xl"></div>
+
+    <div class="relative grid items-center gap-12 lg:grid-cols-2">
+      <div>
+        <span class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/80 px-3 py-1 text-xs font-medium text-brand-800">
+          <Icon name="sparkles" class="h-3.5 w-3.5" /> Conversational spatial analysis
+        </span>
+        <h1 class="mt-5 text-balance text-4xl font-extrabold leading-tight tracking-tight text-slate-900 sm:text-5xl">
+          Spatial analysis you can <span class="whitespace-nowrap text-brand-700">talk to.</span>
+        </h1>
+        <p class="mt-5 max-w-xl text-lg leading-relaxed text-slate-600">
+          Spatchat turns plain-language questions into real geospatial and ecological analyses. Upload your data, ask what you
+          want to know, and get maps, plots and tables back, with no code and nothing to install.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="/browse" class="inline-flex items-center gap-2 rounded-xl bg-brand-700 px-6 py-3 font-medium text-white shadow-sm transition hover:bg-brand-800">
+            Explore the rooms <Icon name="arrow" class="h-4 w-4" />
+          </a>
+          <a href="#how" class="inline-flex items-center gap-2 rounded-xl border border-brand-300 bg-white px-6 py-3 font-medium text-brand-800 transition hover:bg-cream-100">
+            See how it works
+          </a>
+        </div>
+        <ul class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-600">
+          <li class="flex items-center gap-2"><Icon name="check" class="h-4 w-4 text-brand-700" /> 5 specialized rooms</li>
+          <li class="flex items-center gap-2"><Icon name="check" class="h-4 w-4 text-brand-700" /> Runs in your browser</li>
+          <li class="flex items-center gap-2"><Icon name="check" class="h-4 w-4 text-brand-700" /> Open-source rooms</li>
+          <li class="flex items-center gap-2"><Icon name="check" class="h-4 w-4 text-brand-700" /> Free to start</li>
+        </ul>
+      </div>
+
+      <!-- Illustration: a conversation and the map it produces -->
+      <figure class="relative">
+        <div class="overflow-hidden rounded-2xl border border-cream-200 bg-white shadow-2xl shadow-brand-200/40">
+          <div class="flex items-center gap-2 border-b border-cream-200 bg-cream-50 px-4 py-3">
+            <span class="h-2.5 w-2.5 rounded-full bg-brand-300"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-brand-200"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-cream-200"></span>
+            <span class="ml-3 text-xs text-slate-500">Animal Movement and Home Range</span>
+          </div>
+          <div class="grid sm:grid-cols-5">
+            <div class="space-y-3 p-4 text-sm sm:col-span-3">
+              <div class="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-brand-100 px-3.5 py-2 text-slate-800">I want 95 KDE</div>
+              <div class="w-fit max-w-[90%] rounded-2xl rounded-bl-md bg-cream-100 px-3.5 py-2 text-slate-700">KDE home ranges (95%) calculated (raster and contours).</div>
+              <div class="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-brand-100 px-3.5 py-2 text-slate-800">Behavioral states (HMM)</div>
+              <div class="w-fit max-w-[90%] rounded-2xl rounded-bl-md bg-cream-100 px-3.5 py-2 text-slate-700">Hidden Markov state analysis complete for 1 track(s).</div>
+              <div class="flex items-center gap-2 rounded-xl border border-cream-200 px-3 py-2 text-slate-400">
+                <span class="flex-1">Message Spatchat…</span>
+                <span class="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-700 text-white"><Icon name="arrow" class="h-3.5 w-3.5" /></span>
+              </div>
+            </div>
+            <div class="border-t border-cream-200 bg-cream-50 sm:col-span-2 sm:border-l sm:border-t-0">
+              <svg viewBox="0 0 220 230" class="h-full w-full" role="img" aria-label="Illustration of GPS fixes with 95% and 50% home range contours">
+                <defs>
+                  <pattern id="grid" width="22" height="22" patternUnits="userSpaceOnUse">
+                    <path d="M22 0H0V22" fill="none" stroke="#eadfd8" stroke-width="0.8" />
+                  </pattern>
+                </defs>
+                <rect width="220" height="230" fill="url(#grid)" />
+                <path d="M34 112C24 70 68 38 112 44c46 6 66 48 56 90-10 41-52 56-88 46-32-9-40-37-46-68Z" fill="#ffcadb" fill-opacity="0.6" stroke="#ff8db3" stroke-width="1.5" />
+                <path d="M64 110c-5-24 20-42 44-38 28 5 42 30 33 55-8 24-36 31-56 24-14-5-17-23-21-41Z" fill="#ffadc7" fill-opacity="0.75" stroke="#fd7ba7" stroke-width="1.2" />
+                <polyline points={track} fill="none" stroke="#a8305f" stroke-opacity="0.45" stroke-width="0.9" />
+                {fixes.map(([x, y]) => <circle cx={x.toFixed(1)} cy={y.toFixed(1)} r="2" fill="#d94a80" fill-opacity="0.85" />)}
+                <g font-size="9" font-family="ui-sans-serif, system-ui, sans-serif" fill="#a8305f">
+                  <rect x="12" y="196" width="78" height="22" rx="6" fill="#fff" stroke="#eadfd8" />
+                  <circle cx="24" cy="207" r="4" fill="#ffcadb" stroke="#ff8db3" />
+                  <text x="33" y="210">95% range</text>
+                  <rect x="96" y="196" width="78" height="22" rx="6" fill="#fff" stroke="#eadfd8" />
+                  <circle cx="108" cy="207" r="4" fill="#ffadc7" stroke="#fd7ba7" />
+                  <text x="117" y="210">50% core</text>
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <figcaption class="mt-3 text-center text-xs text-slate-500">An example conversation and the home range it produces (illustration).</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============================ How it works ============================ -->
+  <section id="how" class="mx-auto max-w-6xl scroll-mt-24 py-20">
+    <div class="reveal mx-auto max-w-2xl text-center">
+      <p class="text-sm font-semibold uppercase tracking-wider text-brand-800">How it works</p>
+      <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">From question to map in three steps</h2>
+      <p class="mt-3 text-slate-600">No scripting, no menus to hunt through, no software to install.</p>
+    </div>
+    <ol class="mt-12 grid gap-6 md:grid-cols-3">
+      {steps.map((step, i) => (
+        <li class="reveal relative rounded-2xl border border-cream-200 bg-white p-7 shadow-sm">
+          <span class="absolute -top-4 left-7 flex h-8 w-8 items-center justify-center rounded-full bg-brand-700 text-sm font-bold text-white shadow">{i + 1}</span>
+          <span class="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-800"><Icon name={step.icon} /></span>
+          <h3 class="mt-5 text-lg font-semibold text-slate-900">{step.title}</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-600">{step.text}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <!-- ============================ Rooms / use cases ============================ -->
+  <section id="rooms" class="-mx-8 scroll-mt-24 bg-cream-100 px-8 py-20">
+    <div class="mx-auto max-w-6xl">
+      <div class="reveal mx-auto max-w-2xl text-center">
+        <p class="text-sm font-semibold uppercase tracking-wider text-brand-800">What you can do</p>
+        <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">A room for every kind of question</h2>
+        <p class="mt-3 text-slate-600">Each room is a focused assistant with its own tools. Pick the one that matches your question, or use several on the same data.</p>
+      </div>
+
+      <div class="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {rooms.map((room) => (
+          <article class="reveal group flex flex-col rounded-2xl border border-cream-200 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-lg">
+            <div class="flex min-h-[3.5rem] items-center gap-3">
+              <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-800 transition group-hover:bg-brand-100"><Icon name={room.icon} /></span>
+              <h3 class="text-lg font-semibold leading-snug text-slate-900">{room.name}</h3>
+            </div>
+            <p class="mt-4 font-medium text-slate-800">{room.question}</p>
+            <p class="mt-1 text-sm text-slate-500">Best for: {room.forWho}</p>
+
+            <p class="mt-5 text-xs font-semibold uppercase tracking-wider text-slate-400">Try asking</p>
+            <ul class="mt-2 flex flex-wrap gap-2">
+              {room.prompts.map((prompt) => (
+                <li class="rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs text-brand-900">“{prompt}”</li>
+              ))}
+            </ul>
+
+            <p class="mt-5 text-xs font-semibold uppercase tracking-wider text-slate-400">What you get</p>
+            <ul class="mt-2 space-y-1.5 text-sm text-slate-600">
+              {room.gets.map((item) => (
+                <li class="flex gap-2"><Icon name="check" class="mt-0.5 h-4 w-4 shrink-0 text-brand-700" /><span>{item}</span></li>
+              ))}
+            </ul>
+
+            <a href={roomHref(room.slug)} class="mt-auto inline-flex items-center gap-2 pt-6 text-sm font-semibold text-brand-800 hover:text-brand-900">
+              Open this room <Icon name="arrow" class="h-4 w-4 transition group-hover:translate-x-1" />
+            </a>
+          </article>
+        ))}
+
+        <article class="reveal flex flex-col rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50/50 p-7">
+          <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-brand-800"><Icon name="code" /></span>
+          <h3 class="mt-4 text-lg font-semibold text-slate-900">Your room here</h3>
+          <p class="mt-2 text-sm leading-relaxed text-slate-600">
+            Spatchat is built to be extended. Package a model or workflow from your own field behind a chat interface and share it with others.
+          </p>
+          <a href="https://github.com/Spatchat-org" target="_blank" rel="noopener" class="mt-auto inline-flex items-center gap-2 pt-6 text-sm font-semibold text-brand-800 hover:text-brand-900">
+            Build on GitHub <Icon name="arrow" class="h-4 w-4" />
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ Who it's for ============================ -->
+  <section class="mx-auto max-w-6xl py-20">
+    <div class="reveal mx-auto max-w-2xl text-center">
+      <p class="text-sm font-semibold uppercase tracking-wider text-brand-800">Who it’s for</p>
+      <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">Made for people who work with landscapes</h2>
+    </div>
+    <div class="mt-12 grid gap-6 sm:grid-cols-2">
+      {audiences.map((person) => (
+        <div class="reveal flex gap-5 rounded-2xl border border-cream-200 bg-white p-6 shadow-sm">
+          <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-800"><Icon name={person.icon} /></span>
+          <div>
+            <h3 class="font-semibold text-slate-900">{person.title}</h3>
+            <p class="mt-1.5 text-sm leading-relaxed text-slate-600">{person.text}</p>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ============================ See it in action ============================ -->
+  <section class="-mx-8 bg-gradient-to-r from-cream-100 to-cream-50 px-8 py-20">
+    <div class="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-2">
+      <div class="reveal">
+        <p class="text-sm font-semibold uppercase tracking-wider text-brand-800">See it in action</p>
+        <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">The chat on one side, your analysis on the other</h2>
+        <p class="mt-4 leading-relaxed text-slate-600">
+          Every room has the same simple layout, so once you have used one you know them all.
+        </p>
+        <ul class="mt-6 space-y-3 text-slate-700">
+          <li class="flex gap-3"><span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-800"><Icon name="message" class="h-3.5 w-3.5" /></span> Talk to the assistant on the left</li>
+          <li class="flex gap-3"><span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-800"><Icon name="map" class="h-3.5 w-3.5" /></span> Watch maps, plots and files appear on the right</li>
+          <li class="flex gap-3"><span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-800"><Icon name="download" class="h-3.5 w-3.5" /></span> Download everything you made when you’re done</li>
+        </ul>
+      </div>
+      <div class="reveal overflow-hidden rounded-2xl border border-cream-200 bg-white shadow-2xl shadow-brand-200/40">
+        <div class="flex items-center gap-2 border-b border-cream-200 bg-cream-50 px-4 py-3">
+          <span class="h-2.5 w-2.5 rounded-full bg-brand-300"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-brand-200"></span>
+          <span class="h-2.5 w-2.5 rounded-full bg-cream-200"></span>
+        </div>
+        <img
+          src="/images/room-move-kde.jpg"
+          alt="The Animal Movement and Home Range room after the request “95% KDE”: the chat on the left, and the 95% home ranges of two animals drawn on a satellite map on the right"
+          loading="lazy"
+          decoding="async"
+          width="1460"
+          height="612"
+          class="w-full"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ Under the hood ============================ -->
+  <section id="engine" class="mx-auto max-w-6xl scroll-mt-24 py-20">
+    <div class="reveal mx-auto max-w-2xl text-center">
+      <p class="text-sm font-semibold uppercase tracking-wider text-brand-800">Under the hood</p>
+      <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">A conversation on the outside, real analysis inside</h2>
+      <p class="mt-3 text-slate-600">
+        Each room combines a conversational interface, an intent parser powered by a large language model, and a backend spatial engine.
+      </p>
+    </div>
+    <ol class="mt-12 grid gap-4 md:grid-cols-4">
+      {pipeline.map((item, i) => (
+        <li class="reveal relative rounded-2xl border border-cream-200 bg-white p-6 shadow-sm">
+          <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-800"><Icon name={item.icon} class="h-5 w-5" /></span>
+          <h3 class="mt-4 font-semibold text-slate-900">{item.title}</h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-slate-600">{item.text}</p>
+          {i < pipeline.length - 1 && (
+            <span class="absolute -right-3 top-1/2 z-10 hidden h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-brand-700 text-white md:flex"><Icon name="arrow" class="h-3.5 w-3.5" /></span>
+          )}
+        </li>
+      ))}
+    </ol>
+    <p class="reveal mx-auto mt-8 max-w-3xl rounded-2xl border border-brand-200 bg-brand-50 px-6 py-4 text-center text-sm text-brand-900">
+      The language model decides what to run. The numbers come from the analysis code, not from the model.
     </p>
   </section>
 
-  <!-- About Content -->
-  <section class="max-w-5xl mx-auto px-6 py-18 space-y-12 text-gray-800 leading-relaxed">
-    <div>
-      <h2 class="text-3xl font-bold mb-4">Our Vision</h2>
-      <p>
-        Spatchat.org is an open, extensible platform for conversational spatial analysis, powered by artificial intelligence and large language models (LLMs). 
-        It enables researchers, educators, and practitioners to build and share modular chatbot interfaces (i.e., "rooms") for landscape and ecological modeling.
-        Spatchat represents a paradigm shift: it democratizes access to complex geospatial tools by enabling natural language interaction.
+  <!-- ============================ Why we built it ============================ -->
+  <section class="-mx-8 bg-white px-8 py-20">
+    <div class="mx-auto grid max-w-6xl gap-12 lg:grid-cols-5">
+      <div class="reveal lg:col-span-3">
+        <p class="text-sm font-semibold uppercase tracking-wider text-brand-800">Why we built it</p>
+        <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">Powerful tools shouldn’t be intimidating</h2>
+        <p class="mt-5 leading-relaxed text-slate-600">
+          Geospatial tools like GRASS GIS, ArcGIS and Python are powerful, but they ask a lot: technical expertise, fluency in more than one
+          language, and hundreds of lines of code. Spatchat grew out of real teaching experience and a wish to make spatial analysis
+          more accessible, especially for students and early-career professionals.
+        </p>
+        <p class="mt-4 leading-relaxed text-slate-600">
+          Spatchat.org is an open, extensible platform for conversational spatial analysis. It lets researchers, educators and practitioners
+          build and share modular chatbot interfaces, which we call rooms, for landscape and ecological modeling, and it opens complex
+          geospatial tools to anyone who can ask a question.
+        </p>
+      </div>
+      <div class="reveal lg:col-span-2">
+        <div class="rounded-2xl border border-cream-200 bg-cream-50 p-7">
+          <h3 class="font-semibold text-slate-900">What that means in practice</h3>
+          <ul class="mt-4 space-y-4 text-sm text-slate-600">
+            <li class="flex gap-3"><Icon name="check" class="mt-0.5 h-5 w-5 shrink-0 text-brand-700" /><span><strong class="text-slate-800">Lower barrier.</strong> Ask for an analysis the way you would ask a colleague.</span></li>
+            <li class="flex gap-3"><Icon name="check" class="mt-0.5 h-5 w-5 shrink-0 text-brand-700" /><span><strong class="text-slate-800">Nothing to install.</strong> It is cloud-native, so it runs in your browser.</span></li>
+            <li class="flex gap-3"><Icon name="check" class="mt-0.5 h-5 w-5 shrink-0 text-brand-700" /><span><strong class="text-slate-800">Many tools, one interface.</strong> Python, R, Java and REST APIs behind a simple chat.</span></li>
+            <li class="flex gap-3"><Icon name="check" class="mt-0.5 h-5 w-5 shrink-0 text-brand-700" /><span><strong class="text-slate-800">Open and modular.</strong> Built for community-contributed rooms.</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ Looking ahead ============================ -->
+  <section class="mx-auto max-w-6xl py-20">
+    <div class="reveal mx-auto max-w-2xl text-center">
+      <p class="text-sm font-semibold uppercase tracking-wider text-brand-800">Looking ahead</p>
+      <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">Where Spatchat is going</h2>
+    </div>
+    <div class="mt-12 grid gap-6 md:grid-cols-3">
+      <div class="reveal rounded-2xl border border-cream-200 bg-white p-7 shadow-sm">
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-800"><Icon name="grid" /></span>
+        <h3 class="mt-4 font-semibold text-slate-900">A hub for spatial modeling bots</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">One place to find, try and combine assistants for landscape and ecological modeling.</p>
+      </div>
+      <div class="reveal rounded-2xl border border-cream-200 bg-white p-7 shadow-sm">
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-800"><Icon name="users" /></span>
+        <h3 class="mt-4 font-semibold text-slate-900">Open collaboration</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Lower the barriers to entry and grow a community that contributes new rooms and ideas.</p>
+      </div>
+      <div class="reveal rounded-2xl border border-cream-200 bg-white p-7 shadow-sm">
+        <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-800"><Icon name="cap" /></span>
+        <h3 class="mt-4 font-semibold text-slate-900">Younger learners</h3>
+        <p class="mt-2 text-sm leading-relaxed text-slate-600">Let high school students explore landscape ecology through natural language long before they would normally touch GIS or programming.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ FAQ ============================ -->
+  <section id="faq" class="mx-auto max-w-3xl scroll-mt-24 pb-20">
+    <div class="reveal text-center">
+      <p class="text-sm font-semibold uppercase tracking-wider text-brand-800">FAQ</p>
+      <h2 class="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl">Questions people ask</h2>
+    </div>
+    <div class="mt-10 space-y-3">
+      {faqs.map((item) => (
+        <details class="reveal group rounded-2xl border border-cream-200 bg-white px-6 py-4 shadow-sm open:border-brand-300">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-slate-900">
+            {item.q}
+            <Icon name="chevron" class="h-5 w-5 shrink-0 text-brand-800 transition group-open:rotate-180" />
+          </summary>
+          <p class="mt-3 text-sm leading-relaxed text-slate-600">
+            {item.a}
+            {item.link && (
+              <>
+                {" "}<a href={item.link.href} class="font-medium text-brand-800 underline hover:text-brand-900">{item.link.label}</a>.
+              </>
+            )}
+          </p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <!-- ============================ Call to action ============================ -->
+  <section class="reveal relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-700 to-brand-900 px-6 py-16 text-center text-white sm:px-12">
+    <div class="pointer-events-none absolute -top-20 -left-10 h-56 w-56 rounded-full bg-white/10 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-24 -right-10 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+    <div class="relative">
+      <h2 class="text-3xl font-bold sm:text-4xl">Ready to ask your first question?</h2>
+      <p class="mx-auto mt-3 max-w-xl text-brand-50">
+        We invite researchers, developers, teachers and students to explore what is possible when spatial reasoning becomes conversational.
       </p>
-    </div>
-
-    <div>
-      <h2 class="text-3xl font-bold mb-4">Why We Built It</h2>
-      <p>
-        Geospatial tools like GRASS GIS, ArcGIS, and Python are powerful, but often intimidating. They require significant technical expertise,
-        multi-language proficiency, and hundreds of lines of code. Spatchat is a response to that complexity — inspired by real-world teaching experiences
-        and driven by a desire to make spatial analysis more accessible, especially for students and early-career professionals.
-      </p>
-    </div>
-
-    <div>
-      <h2 class="text-3xl font-bold mb-4">What It Can Do</h2>
-      <ul class="list-disc list-inside space-y-2">
-        <li>Chat-based access to spatial tools — ask questions like “Compare class 1 and 2” or “Calculate edge density.”</li>
-        <li>LLMs translate natural language into code, run models, and return clear results.</li>
-        <li>Support for Python, R, Java, REST APIs — all unified in a simple interface.</li>
-        <li>Cloud-native: no local installation required.</li>
-        <li>Designed to support modular, community-contributed tools.</li>
-      </ul>
-    </div>
-
-    <div>
-      <h2 class="text-3xl font-bold mb-4">Architecture Overview</h2>
-      <p>
-        Each Spatchat room combines a conversational UI, an intent parser powered by LLMs, and a backend spatial engine.
-        Users interact through a lightweight chat interface that can be embedded in websites, notebooks, or apps. Under the hood,
-        python libraries like PyLandStats or models like MaxEnt run based on user prompts — and return structured outputs, charts, and visualizations.
-      </p>
-    </div>
-
-    <div>
-      <h2 class="text-3xl font-bold mb-4">Looking Ahead</h2>
-      <p>
-        Spatchat aims to become a central hub for spatial modeling bots. Our goal is to reduce friction, lower barriers to entry, and foster
-        a community of open collaboration. We're especially excited about the potential for Spatchat to reach younger learners — enabling
-        high school students to engage with landscape ecology through natural language long before they’d normally touch GIS or programming.
-      </p>
-    </div>
-
-    <div>
-      <h2 class="text-3xl font-bold mb-4">Join Us</h2>
-      <p>
-        We invite collaborators — researchers, developers, teachers, and students — to help shape the future of spatial intelligence.
-        Contribute a room, suggest an idea, or simply explore what's possible when geospatial reasoning becomes conversational.
-      </p>
-    </div>
-
-    <div>
-      <h2 class="text-3xl font-bold mb-4">Documentation</h2>
-      <p>
-        Want the full picture? Read the <a href="/docs" class="text-brand-800 underline hover:text-brand-900">introduction to Spatchat</a>.
+      <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <a href="/browse" class="inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-medium text-brand-900 shadow-sm transition hover:bg-cream-100">
+          Explore the rooms <Icon name="arrow" class="h-4 w-4" />
+        </a>
+        <a href="/join" class="inline-flex items-center gap-2 rounded-xl border border-white/60 px-6 py-3 font-medium text-white transition hover:bg-white/10">Meet the team</a>
+      </div>
+      <p class="mt-6 text-sm text-brand-100">
+        Want the full picture? Read the <a href="/docs" class="font-medium text-white underline">introduction to Spatchat</a>.
       </p>
     </div>
   </section>
+
+  <style is:global>
+    /* Gentle reveal-on-scroll; everything stays visible without JavaScript or with reduced motion. */
+    .js .reveal { opacity: 0; transform: translateY(14px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .js .reveal.in { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .js .reveal { opacity: 1; transform: none; transition: none; }
+    }
+  </style>
+
+  <script>
+    const items = document.querySelectorAll(".reveal");
+    if ("IntersectionObserver" in window) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("in");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+      );
+      items.forEach((el) => observer.observe(el));
+    } else {
+      items.forEach((el) => el.classList.add("in"));
+    }
+  </script>
 </Layout>

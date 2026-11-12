@@ -1,122 +1,181 @@
 ---
-// src/pages/join.astro
+// src/pages/join.astro  (linked from the nav as "Team")
 import Layout from '../layouts/layout.astro';
+import Icon from '../components/Icon.astro';
+
+// Founder first, then product, then engineering, then the rest of the team.
+const team = [
+  { name: "Ho Yi Wan", role: "Founder", featured: true },
+  { name: "Logan Hysen", role: "Product Manager" },
+  { name: "Lokesh Lokesh", role: "Software Engineer" },
+  { name: "Hemanth Balla", role: "Software Engineer" },
+  { name: "Katie Moriarty", role: "Team member" },
+  { name: "Danial Nayeri", role: "Team member" },
+];
+
+const initials = (name: string) =>
+  name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+    .join("");
+
+// Deep pink gradients (white initials stay readable), varied in direction so the avatars are distinct but on-brand.
+const gradients = [
+  "bg-gradient-to-br from-brand-700 to-brand-900",
+  "bg-gradient-to-tr from-brand-800 to-brand-700",
+  "bg-gradient-to-bl from-brand-700 to-brand-900",
+  "bg-gradient-to-br from-brand-800 to-brand-900",
+  "bg-gradient-to-tr from-brand-700 to-brand-800",
+  "bg-gradient-to-bl from-brand-800 to-brand-900",
+];
 ---
 
-<Layout title="Join the Community">
-  <h1 class="text-3xl font-bold mb-4 flex items-center gap-2">
-  </h1>
+<Layout title="Team · Spatchat">
+  <!-- ============================ Hero ============================ -->
+  <section class="relative overflow-hidden rounded-3xl border border-cream-200 bg-gradient-to-br from-brand-50 via-cream-50 to-cream-100 px-6 py-14 text-center sm:px-12 sm:py-16">
+    <div class="pointer-events-none absolute -top-24 -right-20 h-64 w-64 rounded-full bg-brand-200/50 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-28 -left-16 h-64 w-64 rounded-full bg-brand-100/70 blur-3xl"></div>
+    <div class="relative">
+      <span class="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/80 px-3 py-1 text-xs font-medium text-brand-800">
+        <Icon name="users" class="h-3.5 w-3.5" /> Our team
+      </span>
+      <h1 class="mt-5 text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl">The people behind Spatchat</h1>
+      <p class="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-slate-600">
+        We’re building Spatchat to make spatial analysis intuitive, conversational and open to everyone. Whether you’re a coder,
+        designer, scientist or curious explorer, there’s a place for you here.
+      </p>
+    </div>
+  </section>
 
+  <!-- ============================ Team ============================ -->
+  <section class="mx-auto max-w-6xl py-16">
+    <div class="mx-auto max-w-2xl text-center">
+      <h2 class="text-3xl font-bold text-slate-900">Meet the team</h2>
+      <p class="mt-3 text-slate-600">
+        Spatchat is built by a growing team of researchers and developers committed to open, intelligent spatial analysis.
+      </p>
+    </div>
 
-<section class="text-center bg-gradient-to-r from-cream-100 to-cream-50 backdrop-blur-sm rounded-xl shadow-inner">
+    <ul class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {team.map((person, i) => (
+        <li class="group flex flex-col items-center rounded-2xl border border-cream-200 bg-white px-6 py-8 text-center shadow-sm transition duration-300 hover:-translate-y-1 hover:border-brand-300 hover:shadow-lg">
+          <span
+            class={`flex h-24 w-24 items-center justify-center rounded-full ${gradients[i % gradients.length]} text-3xl font-bold text-white shadow-md ring-4 ring-brand-50 transition group-hover:ring-brand-100`}
+            aria-hidden="true"
+          >
+            {initials(person.name)}
+          </span>
+          <h3 class="mt-5 text-lg font-semibold text-slate-900">{person.name}</h3>
+          <span
+            class={
+              person.featured
+                ? "mt-2 rounded-full bg-brand-700 px-3 py-1 text-xs font-medium text-white"
+                : person.role === "Team member"
+                  ? "mt-2 rounded-full bg-cream-100 px-3 py-1 text-xs font-medium text-slate-600"
+                  : "mt-2 rounded-full border border-brand-200 bg-brand-50 px-3 py-1 text-xs font-medium text-brand-900"
+            }
+          >
+            {person.role}
+          </span>
+        </li>
+      ))}
+    </ul>
+  </section>
 
-<p class="max-w-2xl mx-auto text-black-600 mb-14 py-12 text-lg">
-  We're building Spatchat to make spatial analysis intuitive, conversational, and open to everyone.
-  Whether you're a coder, designer, scientist, or curious explorer — there's a place for you here.
-</p>
-</section>
+  <!-- ============================ Join the community ============================ -->
+  <section class="-mx-8 bg-cream-100 px-8 py-16">
+    <div class="mx-auto grid max-w-5xl items-center gap-8 lg:grid-cols-5">
+      <div class="lg:col-span-3">
+        <h2 class="text-3xl font-bold text-slate-900">Join the community</h2>
+        <p class="mt-4 leading-relaxed text-slate-600">
+          We are currently developing new chat rooms and features for Spatchat. In the future, we hope to grow a developer community and
+          extend Spatchat to countless other ecological tools. If you are interested in becoming part of this movement, visit our GitHub
+          organization and join the community.
+        </p>
+      </div>
+      <div class="flex lg:col-span-2 lg:justify-end">
+        <a
+          href="https://github.com/Spatchat-org"
+          target="_blank"
+          rel="noopener"
+          class="inline-flex items-center gap-2 rounded-xl bg-brand-700 px-6 py-3 font-medium text-white shadow-sm transition hover:bg-brand-800"
+        >
+          <Icon name="github" class="h-5 w-5" /> Star on GitHub
+        </a>
+      </div>
+    </div>
+  </section>
 
+  <!-- ============================ Collaborating institutions ============================ -->
+  <section class="mx-auto max-w-6xl py-16 text-center">
+    <h2 class="text-3xl font-bold text-slate-900">Collaborating institutions</h2>
+    <p class="mx-auto mt-3 max-w-2xl text-slate-600">
+      Spatchat is proudly developed by a network of collaborators from these institutions.
+    </p>
 
-<section class="py-16 text-center">
-  <h2 class="text-2xl font-bold mb-4">Join the Community</h2>
+    <div class="mt-10 grid grid-cols-2 items-center gap-6 md:grid-cols-4">
+      <div class="flex h-36 items-center justify-center rounded-2xl border border-cream-200 bg-white p-4 shadow-sm">
+        <img
+          src="/images/Spartan-Helmet_Green-RGB.jpg"
+          alt="Michigan State University"
+          loading="lazy"
+          decoding="async"
+          width="144"
+          height="168"
+          class="h-24 w-auto"
+        />
+      </div>
+      <div class="flex h-36 items-center justify-center rounded-2xl border border-cream-200 bg-white p-4 shadow-sm">
+        <img
+          src="/images/OIP.jpg"
+          alt="University of Florida"
+          loading="lazy"
+          decoding="async"
+          width="474"
+          height="88"
+          class="h-12 w-auto"
+        />
+      </div>
+      <div class="flex h-36 items-center justify-center rounded-2xl border border-cream-200 bg-white p-4 shadow-sm">
+        <img
+          src="/images/spiritSeal_CalPolyHumboldt_fullColor.jpg"
+          alt="California State Polytechnic University, Humboldt"
+          loading="lazy"
+          decoding="async"
+          width="1950"
+          height="1950"
+          class="h-24 w-auto"
+        />
+      </div>
+      <div class="flex h-36 items-center justify-center rounded-2xl border border-cream-200 bg-white p-4 shadow-sm">
+        <img
+          src="/images/tamu.png"
+          alt="Texas A&M University"
+          loading="lazy"
+          decoding="async"
+          width="860"
+          height="872"
+          class="h-24 w-auto"
+        />
+      </div>
+    </div>
+  </section>
 
-
-<section class="py-8 text-center">
-  <p class="text-black-600 mb-12">
-    We are currently developing new chat rooms and features for Spatchat! In the future, we hope to grow a developer community and extend Spatchat to countless other ecological tools. If you are interested in becoming a part of this movement, please visit our GitHub Repository below and join our community!
-  </p>
-
-<!-- 🔗 GitHub Stats -->
-    <div class="mt-12">
+  <!-- ============================ Get in touch ============================ -->
+  <section class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-brand-700 to-brand-900 px-6 py-14 text-center text-white sm:px-12">
+    <div class="pointer-events-none absolute -top-20 -left-10 h-56 w-56 rounded-full bg-white/10 blur-3xl"></div>
+    <div class="pointer-events-none absolute -bottom-24 -right-10 h-64 w-64 rounded-full bg-white/10 blur-3xl"></div>
+    <div class="relative">
+      <h2 class="text-3xl font-bold">Get in touch</h2>
+      <p class="mx-auto mt-3 max-w-xl text-brand-50">Questions, feedback, or want to collaborate? We’d love to hear from you.</p>
       <a
-        href="https://github.com/Spatchat-org"
-        target="_blank"
-        class="inline-block bg-brand-700 text-white px-6 py-3 rounded-lg hover:bg-brand-800 transition"
+        href="mailto:spatchat.org@gmail.com"
+        class="mt-8 inline-flex items-center gap-2 rounded-xl bg-white px-6 py-3 font-medium text-brand-900 shadow-sm transition hover:bg-cream-100"
       >
-        🌟 Star on GitHub
+        <Icon name="mail" class="h-5 w-5" /> spatchat.org@gmail.com
       </a>
     </div>
-</section>
-
-<!-- Collaborating Institutions Section -->
-<section class="bg-gray-50 py-16 mt-24">
-  <div class="max-w-6xl mx-auto px-6 text-center">
-    <h2 class="text-3xl font-bold mb-8">🎓 Collaborating Institutions</h2>
-    <p class="text-gray-600 mb-10">
-      Spatchat is proudly developed by a network of collaborators from these institutions:
-    </p>
-
-    <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 gap-8 items-center justify-center">
-      <!-- Example university logos or names -->
-      <img
-        src="/images/Spartan-Helmet_Green-RGB.jpg"
-        alt="Michigan State University"
-        loading="lazy"
-        decoding="async"
-        width="144"
-        height="168"
-        class="h-24 w-auto mx-auto"
-      />
-      <img
-        src="/images/OIP.jpg"
-        alt="University of Florida"
-        loading="lazy"
-        decoding="async"
-        width="474"
-        height="88"
-        class="h-12 w-auto mx-auto"
-      />
-      <img
-        src="/images/spiritSeal_CalPolyHumboldt_fullColor.jpg"
-        alt="California State Polytechnic University, Humboldt"
-        loading="lazy"
-        decoding="async"
-        width="1950"
-        height="1950"
-        class="h-24 w-auto mx-auto"
-      />
-      <img
-        src="/images/tamu.png"
-        alt="Texas A&M University"
-        loading="lazy"
-        decoding="async"
-        width="860"
-        height="872"
-        class="h-24 w-auto mx-auto"
-      />
-    </div>
-  </div>
-</section>
-
-<!-- 🌟 Team Members Section -->
-<section class="bg-white py-16">
-  <div class="max-w-4xl mx-auto px-6 text-center">
-    <h2 class="text-3xl font-bold mb-8">👥 Meet the Team</h2>
-    <p class="text-gray-700 mb-8">Spatchat is built by a growing team of researchers and developers committed to open, intelligent spatial analysis.</p>
-
-    <ul class="text-lg text-gray-800 space-y-2">
-      <li>• Ho Yi Wan</li>
-      <li>• Logan Hysen</li>
-      <li>• Katie Moriarty</li>
-      <li>• Danial Nayeri</li>
-      <li>• Lokesh Lokesh</li>
-    </ul>
-  </div>
-</section>
-
-<!-- ✉️ Contact Section -->
-<section class="bg-cream-100 py-16">
-  <div class="max-w-4xl mx-auto px-6 text-center">
-    <h2 class="text-3xl font-bold mb-6">📬 Get in Touch</h2>
-    <p class="text-gray-700 text-lg mb-6">
-      Questions, feedback, or want to collaborate? We'd love to hear from you.
-    </p>
-    <a href="mailto:spatchat.org@gmail.com" class="inline-block bg-brand-700 text-white px-6 py-3 rounded-lg hover:bg-brand-800 transition">
-      Email Us → spatchat.org@gmail.com
-    </a>
-  </div>
-</section>
-
-
-
+  </section>
 </Layout>
